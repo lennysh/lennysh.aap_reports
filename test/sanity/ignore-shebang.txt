@@ -1,0 +1,2 @@
+# Ignore shebang checks for utility scripts outside the collection
+.github/scripts/molecule-wrapper.py

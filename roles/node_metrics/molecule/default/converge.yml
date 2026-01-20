@@ -3,4 +3,13 @@
   hosts: all
   gather_facts: false
   roles:
-    - role: lennysh.aap_reports.node_metrics
+    - role: ../..
+      vars:
+        aap_url: "https://aap.example.com"
+        aap_username: "admin"
+        aap_password: "password"
+        aap_validate_certs: false
+        node_metrics_output_folder: "/tmp"
+        node_metrics_output_formats:
+          - markdown
+      # Note: This will fail without actual AAP instance, but tests role structure

@@ -1,0 +1,17 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check that report files were created
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ node_metrics_output_folder }}/{{ node_metrics_output_filename }}.md"
+      register: report_files
+      failed_when: false
+
+    - name: Display report file status
+      ansible.builtin.debug:
+        msg: "Report file {{ item.item }} exists: {{ item.stat.exists }}"
+      loop: "{{ report_files.results }}"

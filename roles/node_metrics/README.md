@@ -164,6 +164,18 @@ When generating multiple formats, each format gets its own file:
 - `aap_node_metrics_report.xml`
 - `aap_node_metrics_report.txt`
 
+### Example Reports
+
+Example reports in all supported formats are available in the [`report_examples/`](../../report_examples/) directory:
+
+- [Markdown](../../report_examples/aap_node_metrics_report.md)
+- [CSV](../../report_examples/aap_node_metrics_report.csv)
+- [HTML](../../report_examples/aap_node_metrics_report.html)
+- [JSON](../../report_examples/aap_node_metrics_report.json)
+- [YAML](../../report_examples/aap_node_metrics_report.yaml)
+- [XML](../../report_examples/aap_node_metrics_report.xml)
+- [TXT](../../report_examples/aap_node_metrics_report.txt)
+
 ## Report Structure
 
 All formats contain the same data, structured as follows:

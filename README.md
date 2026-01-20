@@ -65,6 +65,18 @@ This collection includes the following modules:
 
 For detailed usage instructions, see the [node_metrics role documentation](roles/node_metrics/README.md).
 
+## Report Examples
+
+Example reports in all supported formats are available in the [`report_examples/`](report_examples/) directory:
+
+- [Markdown](report_examples/aap_node_metrics_report.md)
+- [CSV](report_examples/aap_node_metrics_report.csv)
+- [HTML](report_examples/aap_node_metrics_report.html)
+- [JSON](report_examples/aap_node_metrics_report.json)
+- [YAML](report_examples/aap_node_metrics_report.yaml)
+- [XML](report_examples/aap_node_metrics_report.xml)
+- [TXT](report_examples/aap_node_metrics_report.txt)
+
 ## Security Notes
 
 - Passwords and tokens are marked as `no_log: true` in Ansible modules

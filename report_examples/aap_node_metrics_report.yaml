@@ -2,7 +2,7 @@
 report:
   title: "Ansible Automation Platform Node Metrics Report"
   aap_url: "https://aap.example.com"
-  generated_at: "2026-01-20 20:41:44 UTC"
+  generated_at: "2026-01-20 21:21:55 UTC"
 
 organizations:
   - name: "Default"

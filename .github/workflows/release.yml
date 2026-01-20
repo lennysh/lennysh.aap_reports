@@ -1,0 +1,56 @@
+name: Build and Publish to Ansible Galaxy
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Ansible
+        run: |
+          pip install ansible-core
+
+      - name: Extract version from release tag
+        id: version
+        run: |
+          # Get the version from the release tag, remove 'v' prefix if present
+          VERSION="${GITHUB_REF#refs/tags/}"
+          VERSION="${VERSION#v}"
+          # Remove '-devel' suffix if present
+          VERSION="${VERSION%-devel}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Update galaxy.yml with release version
+        run: |
+          # Use sed to replace the version in galaxy.yml
+          sed -i "s/^version:.*/version: ${{ steps.version.outputs.version }}/" galaxy.yml
+          echo "Updated galaxy.yml version to ${{ steps.version.outputs.version }}"
+          cat galaxy.yml | grep "^version:"
+
+      - name: Build collection
+        run: |
+          ansible-galaxy collection build .
+
+      - name: Publish to Ansible Galaxy
+        run: |
+          ansible-galaxy collection publish lennysh-aap_reports-*.tar.gz
+        env:
+          ANSIBLE_GALAXY_API_KEY: ${{ secrets.ANSIBLE_GALAXY_API_KEY }}
+
+      - name: Upload collection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: collection-artifact
+          path: lennysh-aap_reports-*.tar.gz
+          retention-days: 30

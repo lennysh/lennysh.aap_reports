@@ -44,7 +44,8 @@ options:
         required: false
         type: bool
         default: true
-author: Lenny Shirley
+author:
+    - Lenny Shirley
 '''
 
 EXAMPLES = r'''
@@ -306,7 +307,7 @@ def run_module():
 
     if not HAS_REQUESTS:
         module.fail_json(msg='The requests library is required for this module. Install it with: pip install requests')
-    
+
     url = module.params['url'].rstrip('/')
     token = module.params.get('token')
     username = module.params.get('username')
@@ -337,10 +338,10 @@ def run_module():
 
         # Fetch organizations
         organizations = get_all_pages(module, url, "/organizations/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
-        
+
         # Fetch host metrics
         host_metrics = get_all_pages(module, url, "/host_metrics/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
-        
+
         # Fetch inventories
         inventories = get_all_pages(module, url, "/inventories/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
 
@@ -365,7 +366,7 @@ def run_module():
         for key in inventory_nodes.keys():
             inv_id, nodename = key.split(':', 1)
             org_id = inventory_org_map.get(int(inv_id))
-            
+
             if org_id:
                 # Convert to lowercase for everything
                 nodename_lower = nodename.lower()
@@ -455,7 +456,7 @@ def run_module():
         for nodename_lower in license_nodes_set.keys():
             if nodename_lower not in node_to_orgs_set:
                 orphaned_license_nodes.append(nodename_lower)
-        
+
         orphaned_licenses_count = len(orphaned_license_nodes)
         if orphaned_licenses_count > 0:
             # Add orphaned nodes entry to org_list
@@ -477,7 +478,7 @@ def run_module():
         for nodename_lower in node_to_orgs_set.keys():
             if len(node_to_orgs_set[nodename_lower]) > 1:
                 totals['shared_nodes'] += 1
-        
+
         # A shared subscription is a subscription-consuming node that appears in more than one organization
         for nodename_lower in license_nodes_set.keys():
             if nodename_lower in node_to_orgs_set and len(node_to_orgs_set[nodename_lower]) > 1:
@@ -497,7 +498,7 @@ def run_module():
                 org_entry['shared_licenses_pct'] = calculate_percentage(org_entry['shared_licenses'], totals['shared_licenses'])
             else:
                 org_entry['shared_licenses_pct'] = None
-        
+
         # Add TOTAL row at the end (no percentages for totals row)
         org_list.append({
             'id': -1,  # Special ID for totals row

@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 module: node_metrics
 short_description: Collect node metrics data from Ansible Automation Platform Controller
 version_added: "1.0.0"
+description:
     - This module connects to the AAP Controller API and collects organization-level node and subscription metrics.
     - Returns structured JSON data that can be used with Ansible templates to generate custom reports.
     - Automatically detects the correct API path (AAP 2.5+ uses /api/controller/v2/, AAP 2.4 and below use /api/v2/).

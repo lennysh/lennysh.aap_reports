@@ -1,0 +1,18 @@
+---
+- name: Generate AAP Node Metrics Reports
+  hosts: localhost
+  gather_facts: false
+
+  roles:
+    - role: lennysh.aap_reports.node_metrics
+      vars:
+        node_metrics_output_folder: "{{ playbook_dir }}"
+        node_metrics_output_filename: "aap_node_metrics_report"
+        node_metrics_output_formats:
+          - markdown
+          - csv
+          - html
+          - json
+          - yaml
+          - xml
+          - txt

@@ -1,0 +1,13 @@
+---
+node_metrics_output_folder: "{{ playbook_dir }}"
+node_metrics_output_filename: "aap_node_metrics_report"
+node_metrics_show_node_details: true
+node_metrics_output_formats:
+  - markdown
+  - csv
+  - html
+  - json
+  - yaml
+  - xml
+  - txt
+...

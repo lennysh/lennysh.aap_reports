@@ -1,0 +1,40 @@
+{
+  "report": {
+    "title": "Ansible Automation Platform Node Metrics Report",
+    "aap_url": "{{ metrics.aap_url }}",
+    "generated_at": "{{ metrics.generated_at }}"
+  },
+  "organizations": [
+{% for org in metrics.organizations %}
+    {
+      "name": "{{ org.name }}",
+      "total_nodes": {{ org.total_nodes }},
+      "total_nodes_pct": {{ org.total_nodes_pct }},
+      "unique_nodes": {{ org.unique_nodes }},
+      "unique_nodes_pct": {{ org.unique_nodes_pct }},
+      "shared_nodes": {% if org.shared_nodes is none %}null{% else %}{{ org.shared_nodes }}{% endif %},
+      "shared_nodes_pct": {% if org.shared_nodes is none %}null{% else %}{{ org.shared_nodes_pct }}{% endif %},
+      "unique_licenses": {{ org.unique_licenses }},
+      "unique_licenses_pct": {{ org.unique_licenses_pct }},
+      "shared_licenses": {% if org.shared_licenses is none %}null{% else %}{{ org.shared_licenses }}{% endif %},
+      "shared_licenses_pct": {% if org.shared_licenses is none %}null{% else %}{{ org.shared_licenses_pct }}{% endif %}
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+  ],
+{% if show_node_details | default(true) | bool %}
+  "nodes": [
+{% for node in metrics.nodes %}
+    {
+      "nodename": "{{ node.nodename }}",
+      "license": {{ node.license | lower }},
+      "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+  ],
+{% endif %}
+  "organization_names": {
+{% for org_id, org_name in metrics.organization_names.items() %}
+    "{{ org_id }}": "{{ org_name }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+  }
+}

@@ -1,0 +1,20 @@
+Ansible Automation Platform Node Metrics Report
+AAP Instance: https://aap.example.com
+Generated: 2026-01-20 19:19:08 UTC
+
+Organization Node and Subscription Metrics
+
+Organization,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,Unique Subscriptions,Unique Subscriptions %,Shared Subscriptions,Shared Subscriptions %
+Default,4,44.4,1,100.0,3,37.5,1,100.0DEMOLab,4,44.4,1,100.0,4,50.0,1,100.0Orphaned Nodes (No Organization),1,11.1,,,1,12.5,,TOTAL,9,,1,,8,,1,Node Details by Organization
+
+Node,Subscription,Default,DEMOLab
+db,Yes,No,Yes
+en,Yes,No,Yes
+gw,Yes,No,Yes
+localhost,Yes,No,Yes
+rhel-demo-01,Yes,Yes,No
+rhel-demo-02,Yes,Yes,No
+rhel-demo-03,Yes,Yes,No
+windows2025-demo,Yes,Yes,Yes
+windows2025-demo-02,No,Yes,No
+windows2025-test,Yes,No,No

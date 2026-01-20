@@ -1,0 +1,97 @@
+{
+  "report": {
+    "title": "Ansible Automation Platform Node Metrics Report",
+    "aap_url": "https://aap.example.com",
+    "generated_at": "2026-01-20 19:19:08 UTC"
+  },
+  "organizations": [
+    {
+      "name": "Default",
+      "total_nodes": 5,
+      "total_nodes_pct": 50.0,
+      "unique_nodes": 4,
+      "unique_nodes_pct": 44.4,
+      "shared_nodes": 1,
+      "shared_nodes_pct": 100.0,
+      "unique_licenses": 3,
+      "unique_licenses_pct": 37.5,
+      "shared_licenses": 1,
+      "shared_licenses_pct": 100.0    },    {
+      "name": "DEMOLab",
+      "total_nodes": 5,
+      "total_nodes_pct": 50.0,
+      "unique_nodes": 4,
+      "unique_nodes_pct": 44.4,
+      "shared_nodes": 1,
+      "shared_nodes_pct": 100.0,
+      "unique_licenses": 4,
+      "unique_licenses_pct": 50.0,
+      "shared_licenses": 1,
+      "shared_licenses_pct": 100.0    },    {
+      "name": "Orphaned Nodes (No Organization)",
+      "total_nodes": 0,
+      "total_nodes_pct": 0.0,
+      "unique_nodes": 1,
+      "unique_nodes_pct": 11.1,
+      "shared_nodes": null,
+      "shared_nodes_pct": null,
+      "unique_licenses": 1,
+      "unique_licenses_pct": 12.5,
+      "shared_licenses": null,
+      "shared_licenses_pct": null    },    {
+      "name": "TOTAL",
+      "total_nodes": 10,
+      "total_nodes_pct": 0.0,
+      "unique_nodes": 9,
+      "unique_nodes_pct": 0.0,
+      "shared_nodes": 1,
+      "shared_nodes_pct": 0.0,
+      "unique_licenses": 8,
+      "unique_licenses_pct": 0.0,
+      "shared_licenses": 1,
+      "shared_licenses_pct": 0.0    }  ],
+  "nodes": [
+    {
+      "nodename": "db",
+      "license": true,
+      "organizations": [4]
+    },    {
+      "nodename": "en",
+      "license": true,
+      "organizations": [4]
+    },    {
+      "nodename": "gw",
+      "license": true,
+      "organizations": [4]
+    },    {
+      "nodename": "localhost",
+      "license": true,
+      "organizations": [4]
+    },    {
+      "nodename": "rhel-demo-01",
+      "license": true,
+      "organizations": [1]
+    },    {
+      "nodename": "rhel-demo-02",
+      "license": true,
+      "organizations": [1]
+    },    {
+      "nodename": "rhel-demo-03",
+      "license": true,
+      "organizations": [1]
+    },    {
+      "nodename": "windows2025-demo",
+      "license": true,
+      "organizations": [1, 4]
+    },    {
+      "nodename": "windows2025-demo-02",
+      "license": false,
+      "organizations": [1]
+    },    {
+      "nodename": "windows2025-test",
+      "license": true,
+      "organizations": []
+    }  ],
+  "organization_names": {
+    "1": "Default",    "4": "DEMOLab"  }
+}

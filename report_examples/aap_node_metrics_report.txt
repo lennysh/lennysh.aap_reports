@@ -1,0 +1,56 @@
+Ansible Automation Platform Node Metrics Report
+AAP Instance: https://aap.example.com
+Generated: 2026-01-20 19:19:08 UTC
+
+================================================================================
+Organization Node and Subscription Metrics
+================================================================================
+
+Organization: Default  Unique Nodes:       4 (44.4%)  Shared Nodes:       1 (100.0%)  Unique Subscriptions:    3 (37.5%)  Shared Subscriptions:    1 (100.0%)
+Organization: DEMOLab  Unique Nodes:       4 (44.4%)  Shared Nodes:       1 (100.0%)  Unique Subscriptions:    4 (50.0%)  Shared Subscriptions:    1 (100.0%)
+Organization: Orphaned Nodes (No Organization)  Unique Nodes:       1 (11.1%)  Shared Nodes:         Unique Subscriptions:    1 (12.5%)  Shared Subscriptions:    
+Organization: **TOTAL**  Unique Nodes:       9  Shared Nodes:       1  Unique Subscriptions:    8  Shared Subscriptions:    1
+================================================================================
+Node Details by Organization
+================================================================================
+
+Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
+
+Node: db
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: No (not a member)    - DEMOLab: Yes (member)
+Node: en
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: No (not a member)    - DEMOLab: Yes (member)
+Node: gw
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: No (not a member)    - DEMOLab: Yes (member)
+Node: localhost
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: No (not a member)    - DEMOLab: Yes (member)
+Node: rhel-demo-01
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: Yes (member)    - DEMOLab: No (not a member)
+Node: rhel-demo-02
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: Yes (member)    - DEMOLab: No (not a member)
+Node: rhel-demo-03
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: Yes (member)    - DEMOLab: No (not a member)
+Node: windows2025-demo
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: Yes (member)    - DEMOLab: Yes (member)
+Node: windows2025-demo-02
+  Subscription: No (not consuming)  Organizations:
+    - Default: Yes (member)    - DEMOLab: No (not a member)
+Node: windows2025-test
+  Subscription: Yes (consuming subscription)  Organizations:
+    - Default: No (not a member)    - DEMOLab: No (not a member)
+================================================================================
+Notes
+================================================================================
+
+- Unique Nodes: Nodes that exist only in this organization
+- Shared Nodes: Nodes that exist in multiple organizations
+- Unique Subscriptions: Subscription-consuming nodes (from node_metrics) that exist only in this organization
+- Shared Subscriptions: Subscription-consuming nodes (from node_metrics) that exist in multiple organizations

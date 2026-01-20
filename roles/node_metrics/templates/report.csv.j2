@@ -1,0 +1,19 @@
+Ansible Automation Platform Node Metrics Report
+AAP Instance: {{ metrics.aap_url }}
+Generated: {{ metrics.generated_at }}
+
+Organization Node and Subscription Metrics
+
+Organization,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,Unique Subscriptions,Unique Subscriptions %,Shared Subscriptions,Shared Subscriptions %
+{% for org in metrics.organizations %}
+{{ org.name }},{{ org.unique_nodes }},{% if org.id == -1 %}{% else %}{{ org.unique_nodes_pct }}{% endif %},{% if org.shared_nodes is none %},{% elif org.id == -1 %}{{ org.shared_nodes }},{% else %}{{ org.shared_nodes }},{{ org.shared_nodes_pct }}{% endif %},{{ org.unique_licenses }},{% if org.id == -1 %}{% else %}{{ org.unique_licenses_pct }}{% endif %},{% if org.shared_licenses is none %},{% elif org.id == -1 %}{{ org.shared_licenses }},{% else %}{{ org.shared_licenses }},{{ org.shared_licenses_pct }}{% endif %}
+{% endfor %}
+{% if show_node_details | default(true) | bool %}
+Node Details by Organization
+
+Node,Subscription{% for org_id in metrics.organization_names.keys() | sort %},{{ metrics.organization_names[org_id] }}{% endfor %}
+{% for node in metrics.nodes %}
+
+{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %}{% for org_id in metrics.organization_names.keys() | sort %},{% if org_id|int in node.organizations %}Yes{% else %}No{% endif %}{% endfor %}
+{% endfor %}
+{% endif %}

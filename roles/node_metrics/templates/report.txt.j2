@@ -1,0 +1,41 @@
+Ansible Automation Platform Node Metrics Report
+AAP Instance: {{ metrics.aap_url }}
+Generated: {{ metrics.generated_at }}
+
+================================================================================
+Organization Node and Subscription Metrics
+================================================================================
+
+{% for org in metrics.organizations %}
+Organization: {% if org.id == -1 %}**{{ org.name }}**{% else %}{{ org.name }}{% endif %}
+  Unique Nodes:       {% if org.id == -1 %}{{ org.unique_nodes }}{% else %}{{ org.unique_nodes }} ({{ org.unique_nodes_pct }}%){% endif %}
+  Shared Nodes:       {% if org.shared_nodes is none %}{% elif org.id == -1 %}{{ org.shared_nodes }}{% else %}{{ org.shared_nodes }} ({{ org.shared_nodes_pct }}%){% endif %}
+  Unique Subscriptions:    {% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %}
+  Shared Subscriptions:    {% if org.shared_licenses is none %}{% elif org.id == -1 %}{{ org.shared_licenses }}{% else %}{{ org.shared_licenses }} ({{ org.shared_licenses_pct }}%){% endif %}
+
+{% endfor %}
+{% if show_node_details | default(true) | bool %}
+================================================================================
+Node Details by Organization
+================================================================================
+
+Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
+
+{% for node in metrics.nodes %}
+Node: {{ node.nodename }}
+  Subscription: {% if node.license %}Yes (consuming subscription){% else %}No (not consuming){% endif %}
+  Organizations:
+{% for org_id in metrics.organization_names.keys() | sort %}
+    - {{ metrics.organization_names[org_id] }}: {% if org_id|int in node.organizations %}Yes (member){% else %}No (not a member){% endif %}
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+================================================================================
+Notes
+================================================================================
+
+- Unique Nodes: Nodes that exist only in this organization
+- Shared Nodes: Nodes that exist in multiple organizations
+- Unique Subscriptions: Subscription-consuming nodes (from node_metrics) that exist only in this organization
+- Shared Subscriptions: Subscription-consuming nodes (from node_metrics) that exist in multiple organizations

@@ -1,0 +1,37 @@
+# Sensitive configuration files
+vars.yml
+*.vault
+*.key
+*.pem
+
+# Python artifacts
+**/__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.Python
+
+# Ansible artifacts
+*.retry
+.ansible/
+
+# Editor and IDE files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+.galaxy_build/
+
+# Ignore directories
+ignore_*

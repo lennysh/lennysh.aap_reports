@@ -1,0 +1,8 @@
+---
+aap_url: "https://aap.example.com"
+aap_validate_certs: true
+aap_username: "admin"
+aap_password: "password"
+# Alternative: use token instead of username/password
+# aap_token: "your-token-here"
+...

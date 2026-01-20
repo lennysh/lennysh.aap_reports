@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+    <title>Ansible Automation Platform Node Metrics Report</title>
+    <aap_url>{{ metrics.aap_url }}</aap_url>
+    <generated_at>{{ metrics.generated_at }}</generated_at>
+    
+    <organizations>
+{% for org in metrics.organizations %}
+        <organization>
+            <name>{{ org.name }}</name>
+            <total_nodes value="{{ org.total_nodes }}" percentage="{{ org.total_nodes_pct }}"/>
+            <unique_nodes value="{{ org.unique_nodes }}" percentage="{{ org.unique_nodes_pct }}"/>
+            {% if org.shared_nodes is not none %}<shared_nodes value="{{ org.shared_nodes }}" percentage="{{ org.shared_nodes_pct }}"/>{% endif %}
+            <unique_licenses value="{{ org.unique_licenses }}" percentage="{{ org.unique_licenses_pct }}"/>
+            {% if org.shared_licenses is not none %}<shared_licenses value="{{ org.shared_licenses }}" percentage="{{ org.shared_licenses_pct }}"/>{% endif %}
+        </organization>
+{% endfor %}
+    </organizations>
+{% if show_node_details | default(true) | bool %}
+    
+    <nodes>
+{% for node in metrics.nodes %}
+        <node>
+            <nodename>{{ node.nodename }}</nodename>
+            <license>{{ node.license | lower }}</license>
+            <organizations>
+{% for org_id in node.organizations %}
+                <organization_id>{{ org_id }}</organization_id>
+{% endfor %}
+            </organizations>
+        </node>
+{% endfor %}
+    </nodes>
+{% endif %}
+    
+    <organization_names>
+{% for org_id, org_name in metrics.organization_names.items() %}
+        <organization id="{{ org_id }}">{{ org_name }}</organization>
+{% endfor %}
+    </organization_names>
+</report>

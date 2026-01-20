@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+    <title>Ansible Automation Platform Node Metrics Report</title>
+    <aap_url>https://aap.example.com</aap_url>
+    <generated_at>2026-01-20 19:19:08 UTC</generated_at>
+    
+    <organizations>
+        <organization>
+            <name>Default</name>
+            <total_nodes value="5" percentage="50.0"/>
+            <unique_nodes value="4" percentage="44.4"/>
+            <shared_nodes value="1" percentage="100.0"/>            <unique_licenses value="3" percentage="37.5"/>
+            <shared_licenses value="1" percentage="100.0"/>        </organization>
+        <organization>
+            <name>DEMOLab</name>
+            <total_nodes value="5" percentage="50.0"/>
+            <unique_nodes value="4" percentage="44.4"/>
+            <shared_nodes value="1" percentage="100.0"/>            <unique_licenses value="4" percentage="50.0"/>
+            <shared_licenses value="1" percentage="100.0"/>        </organization>
+        <organization>
+            <name>Orphaned Nodes (No Organization)</name>
+            <total_nodes value="0" percentage="0.0"/>
+            <unique_nodes value="1" percentage="11.1"/>
+                        <unique_licenses value="1" percentage="12.5"/>
+                    </organization>
+        <organization>
+            <name>TOTAL</name>
+            <total_nodes value="10" percentage="0.0"/>
+            <unique_nodes value="9" percentage="0.0"/>
+            <shared_nodes value="1" percentage="0.0"/>            <unique_licenses value="8" percentage="0.0"/>
+            <shared_licenses value="1" percentage="0.0"/>        </organization>
+    </organizations>
+    
+    <nodes>
+        <node>
+            <nodename>db</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>4</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>en</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>4</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>gw</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>4</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>localhost</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>4</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>rhel-demo-01</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>1</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>rhel-demo-02</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>1</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>rhel-demo-03</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>1</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>windows2025-demo</nodename>
+            <license>true</license>
+            <organizations>
+                <organization_id>1</organization_id>
+                <organization_id>4</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>windows2025-demo-02</nodename>
+            <license>false</license>
+            <organizations>
+                <organization_id>1</organization_id>
+            </organizations>
+        </node>
+        <node>
+            <nodename>windows2025-test</nodename>
+            <license>true</license>
+            <organizations>
+            </organizations>
+        </node>
+    </nodes>
+    
+    <organization_names>
+        <organization id="1">Default</organization>
+        <organization id="4">DEMOLab</organization>
+    </organization_names>
+</report>

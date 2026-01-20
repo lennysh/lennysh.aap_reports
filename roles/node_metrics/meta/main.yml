@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Lenny Shirley
+  description: Ansible Role to generate Ansible Automation Platform Host Metrics Reports
+  company: Red Hat
+  issue_tracker_url: https://github.com/lennysh/lennysh.aap_reports/issues
+  license: MIT
+  min_ansible_version: 2.15.0
+  galaxy_tags:
+    - aap
+    - reports
+    - automation
+    - ansible
+    - host
+    - metrics
+dependencies: []

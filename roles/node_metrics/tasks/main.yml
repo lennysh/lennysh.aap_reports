@@ -1,0 +1,65 @@
+---
+# tasks file for node_metrics
+
+- name: Collect node metrics data
+  lennysh.aap_reports.node_metrics:
+    url: "{{ aap_url }}"
+    username: "{{ aap_username | default(omit) }}"
+    password: "{{ aap_password | default(omit) }}"
+    token: "{{ aap_token | default(omit) }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+  register: __metrics_data_result
+
+- name: Set metrics_data from successful result
+  ansible.builtin.set_fact:
+    __metrics_data: "{{ __metrics_data_result }}"
+  when:
+    - __metrics_data_result is defined
+    - __metrics_data_result.skipped is not defined or not __metrics_data_result.skipped
+    - __metrics_data_result.failed is not defined or not __metrics_data_result.failed
+
+- name: Verify metrics data was collected successfully
+  ansible.builtin.assert:
+    that:
+      - __metrics_data is defined
+      - __metrics_data.organizations_count is defined
+      - __metrics_data.nodes_count is defined
+      - __metrics_data.metrics is defined
+    fail_msg: |
+      Failed to collect metrics data.
+      Check authentication credentials and AAP URL.
+      {% if __metrics_data_result.msg is defined %}
+      Error: {{ __metrics_data_result.msg }}
+      {% endif %}
+      {% if __metrics_data_result.failed is defined %}
+      Task failed: {{ __metrics_data_result.failed }}
+      {% endif %}
+      {% if __metrics_data_result.skipped is defined %}
+      Task was skipped. Condition: {{ __metrics_data_result.false_condition | default('Unknown') }}
+      {% endif %}
+      Available keys: {{ __metrics_data_result.keys() | default([]) | list | join(', ') }}
+    success_msg: "Metrics data collected successfully"
+
+- name: Display metrics summary
+  ansible.builtin.debug:
+    msg:
+      - "Organizations: {{ __metrics_data.organizations_count }}"
+      - "Nodes: {{ __metrics_data.nodes_count }}"
+      - "Generated at: {{ __metrics_data.metrics.generated_at }}"
+
+- name: Ensure output folder exists
+  ansible.builtin.file:
+    path: "{{ node_metrics_output_folder }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate report(s) using template(s)
+  loop: "{{ node_metrics_output_formats }}"
+  vars:
+    metrics: "{{ __metrics_data.metrics }}"
+    show_node_details: "{{ node_metrics_show_node_details | default(true) | bool }}"
+  ansible.builtin.template:
+    src: "{{ node_metrics_format_templates[item] }}"
+    dest: "{{ node_metrics_output_folder }}/{{ node_metrics_output_filename }}.{{ node_metrics_format_extensions[item] }}"
+    mode: "0644"
+...

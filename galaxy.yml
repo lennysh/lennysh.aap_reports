@@ -38,11 +38,10 @@ tags:
 - aap
 - reports
 - automation
-- automation-platform
+- automationplatform
 - ansible
-- ansible-collection
-- ansible-galaxy
-- ansible-collection-lennysh
+- ansiblecollection
+- ansiblegalaxy
 
 # Collections that this collection requires to be installed for it to be usable. The key of the dict is the
 # collection label 'namespace.name'. The value is a version range

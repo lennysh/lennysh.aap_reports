@@ -65,6 +65,11 @@ issues: https://github.com/lennysh/lennysh.aap_reports/issues
 # and '.git' are always filtered. Mutually exclusive with 'manifest'
 build_ignore:
   - __pycache__/
+  - ignore_other/
+  - report_examples/
+  - vars.yml
+  - .github/
+  - docs/
 
 # A dict controlling use of manifest directives used in building the collection artifact. The key 'directives' is a
 # list of MANIFEST.in style

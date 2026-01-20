@@ -75,7 +75,11 @@ jobs:
           pip install ansible-core
       - name: Install collection dependencies
         run: |
-          ansible-galaxy collection install -r collections/requirements.yml
+          if [ -f collections/requirements.yml ]; then
+            ansible-galaxy collection install -r collections/requirements.yml
+          else
+            echo "No collections/requirements.yml found, skipping collection dependencies"
+          fi
       - name: Verify Podman is available
         run: |
           podman --version

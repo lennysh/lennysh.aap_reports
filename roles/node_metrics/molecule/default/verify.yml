@@ -8,10 +8,10 @@
         path: "{{ item }}"
       loop:
         - "{{ node_metrics_output_folder }}/{{ node_metrics_output_filename }}.md"
-      register: report_files
+      register: node_metrics_report_files
       failed_when: false
 
     - name: Display report file status
       ansible.builtin.debug:
         msg: "Report file {{ item.item }} exists: {{ item.stat.exists }}"
-      loop: "{{ report_files.results }}"
+      loop: "{{ node_metrics_report_files.results }}"

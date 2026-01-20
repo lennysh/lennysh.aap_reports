@@ -87,25 +87,30 @@ jobs:
       - name: Run molecule test
         working-directory: roles/${{ matrix.role }}
         run: |
-          # Workaround for molecule 25.x schema validation issue with podman driver
-          # Use wrapper script to bypass validation, fallback to individual commands
-          set +e
-          WRAPPER_SCRIPT="${{ github.workspace }}/.github/scripts/molecule-wrapper.py"
-          python3 "$WRAPPER_SCRIPT" test 2>&1 | tee /tmp/molecule-output.log
-          WRAPPER_EXIT=${PIPESTATUS[0]}
+          if [ -f molecule.yml ] || [ -f .config.yml ] || [ -d molecule ]; then
+            # Workaround for molecule 25.x schema validation issue with podman driver
+            # Use wrapper script to bypass validation, fallback to individual commands
+            set +e
+            WRAPPER_SCRIPT="${{ github.workspace }}/.github/scripts/molecule-wrapper.py"
+            python3 "$WRAPPER_SCRIPT" test 2>&1 | tee /tmp/molecule-output.log
+            WRAPPER_EXIT=${PIPESTATUS[0]}
 
-          # If wrapper failed with validation error, try individual commands
-          if [ $WRAPPER_EXIT -ne 0 ]; then
-            if grep -q "does not provide a schema\|Failed to validate" /tmp/molecule-output.log; then
-              echo "⚠️  Schema validation issue detected, running commands individually..."
-              python3 "$WRAPPER_SCRIPT" create && \
-              python3 "$WRAPPER_SCRIPT" converge && \
-              python3 "$WRAPPER_SCRIPT" verify && \
-              python3 "$WRAPPER_SCRIPT" destroy
-              exit $?
-            else
-              exit $WRAPPER_EXIT
+            # If wrapper failed with validation error, try individual commands
+            if [ $WRAPPER_EXIT -ne 0 ]; then
+              if grep -q "does not provide a schema\|Failed to validate" /tmp/molecule-output.log; then
+                echo "⚠️  Schema validation issue detected, running commands individually..."
+                python3 "$WRAPPER_SCRIPT" create && \
+                python3 "$WRAPPER_SCRIPT" converge && \
+                python3 "$WRAPPER_SCRIPT" verify && \
+                python3 "$WRAPPER_SCRIPT" destroy
+                exit $?
+              else
+                exit $WRAPPER_EXIT
+              fi
             fi
+          else
+            echo "No molecule configuration found, skipping molecule tests"
+            exit 0
           fi
         env:
           PY_COLORS: "1"

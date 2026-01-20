@@ -137,4 +137,3 @@ if __name__ == '__main__':
             print(f"⚠️  Schema validation error (known molecule 25.x issue): {e}", file=sys.stderr)
             sys.exit(1)
         raise
-

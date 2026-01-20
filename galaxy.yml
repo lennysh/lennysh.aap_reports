@@ -8,6 +8,7 @@ description: Ansible Collection for various custom Ansible Automation Platform R
 license:
   - MIT-0
 tags:
+  - monitoring
   - aap
   - reports
   - automation

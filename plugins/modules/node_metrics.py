@@ -44,8 +44,7 @@ options:
         required: false
         type: bool
         default: true
-author:
-    - Lenny Shirley
+author: "Lenny Shirley (@lennysh)"
 '''
 
 EXAMPLES = r'''

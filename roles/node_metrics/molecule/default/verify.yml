@@ -2,6 +2,9 @@
 - name: Verify
   hosts: all
   gather_facts: false
+  vars:
+    node_metrics_output_folder: "/tmp"
+    node_metrics_output_filename: "aap_node_metrics_report"
   tasks:
     - name: Check that report files were created
       ansible.builtin.stat:

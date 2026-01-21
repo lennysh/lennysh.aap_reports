@@ -15,12 +15,12 @@
 
 Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
 
-| Node | Subscription |{% for org_id in metrics.organization_names.keys() | sort %} {{ metrics.organization_names[org_id] }} |{% endfor %}
+| Node | Subscription |{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %} {{ org_name }} |{% endfor %}
 
-|------|---------|{% for org_id in metrics.organization_names.keys() | sort %}------|{% endfor %}
+|------|---------|{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}------|{% endfor %}
 
 {% for node in metrics.nodes %}
-| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% for org_id in metrics.organization_names.keys() | sort %} {% if org_id|int in node.organizations %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% endfor %}
+| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %} {% if org_id|int in node.organizations %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% endfor %}
 
 {% endfor %}
 {% endif %}

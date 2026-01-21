@@ -209,8 +209,8 @@
                 <tr>
                     <th>Node</th>
                     <th>Subscription</th>
-                    {% for org_id in metrics.organization_names.keys() | sort %}
-                    <th>{{ metrics.organization_names[org_id] }}</th>
+                    {% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}
+                    <th>{{ org_name }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -221,7 +221,7 @@
                     <td class="{% if node.license %}check-green{% else %}check-red{% endif %}">
                         {% if node.license %}✓{% else %}✗{% endif %}
                     </td>
-                    {% for org_id in metrics.organization_names.keys() | sort %}
+                    {% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}
                     <td class="{% if org_id|int in node.organizations %}check-green{% else %}check-red{% endif %}">
                         {% if org_id|int in node.organizations %}✓{% else %}✗{% endif %}
                     </td>

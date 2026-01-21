@@ -11,9 +11,9 @@ Organization,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,Unique Subs
 {% if show_node_details | default(true) | bool %}
 Node Details by Organization
 
-Node,Subscription{% for org_id in metrics.organization_names.keys() | sort %},{{ metrics.organization_names[org_id] }}{% endfor %}
+Node,Subscription{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %},{{ org_name }}{% endfor %}
 {% for node in metrics.nodes %}
 
-{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %}{% for org_id in metrics.organization_names.keys() | sort %},{% if org_id|int in node.organizations %}Yes{% else %}No{% endif %}{% endfor %}
+{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %}{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %},{% if org_id|int in node.organizations %}Yes{% else %}No{% endif %}{% endfor %}
 {% endfor %}
 {% endif %}

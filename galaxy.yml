@@ -1,6 +1,6 @@
 namespace: lennysh
 name: aap_reports
-version: 1.0.1-devel
+version: 1.0.2-devel
 readme: README.md
 authors:
   - Lenny Shirley @lennysh

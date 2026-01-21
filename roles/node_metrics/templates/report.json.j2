@@ -18,7 +18,9 @@
       "unique_licenses_pct": {{ org.unique_licenses_pct }},
       "shared_licenses": {% if org.shared_licenses is none %}null{% else %}{{ org.shared_licenses }}{% endif %},
       "shared_licenses_pct": {% if org.shared_licenses is none %}null{% else %}{{ org.shared_licenses_pct }}{% endif %}
-    }{% if not loop.last %},{% endif %}
+
+    }{% if not loop.last %},
+{% endif %}
 {% endfor %}
   ],
 {% if show_node_details | default(true) | bool %}
@@ -28,13 +30,15 @@
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
       "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    }{% if not loop.last %},{% endif %}
+    }{% if not loop.last %},
+{% endif %}
 {% endfor %}
   ],
 {% endif %}
   "organization_names": {
 {% for org_id, org_name in metrics.organization_names.items() %}
-    "{{ org_id }}": "{{ org_name }}"{% if not loop.last %},{% endif %}
+    "{{ org_id }}": "{{ org_name }}"{% if not loop.last %},
+{% endif %}
 {% endfor %}
   }
 }

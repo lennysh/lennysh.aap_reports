@@ -6,14 +6,44 @@ Generated: {{ metrics.generated_at }}
 Organization Node and Subscription Metrics
 ================================================================================
 
+{% set org_name_width = 40 %}
+{% set col_width = 18 %}
+{% macro pad(text, width) %}{{ text }}{{ " " * (width - text | length) }}{% endmacro %}
+{{ pad("Organization Name", org_name_width) }}| {{ pad("Unique Nodes", col_width) }}| {{ pad("Shared Nodes", col_width) }}| {{ pad("Unique Subs", col_width) }}| {{ pad("Shared Subs", col_width) }}
+{{ "-" * org_name_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}
 {% for org in metrics.organizations %}
-Organization: {% if org.id == -1 %}**{{ org.name }}**{% else %}{{ org.name }}{% endif %}
-  Unique Nodes:       {% if org.id == -1 %}{{ org.unique_nodes }}{% else %}{{ org.unique_nodes }} ({{ org.unique_nodes_pct }}%){% endif %}
-  Shared Nodes:       {% if org.shared_nodes is none %}{% elif org.id == -1 %}{{ org.shared_nodes }}{% else %}{{ org.shared_nodes }} ({{ org.shared_nodes_pct }}%){% endif %}
-  Unique Subscriptions:    {% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %}
-  Shared Subscriptions:    {% if org.shared_licenses is none %}{% elif org.id == -1 %}{{ org.shared_licenses }}{% else %}{{ org.shared_licenses }} ({{ org.shared_licenses_pct }}%){% endif %}
-
+{% if org.id == -1 %}
+{% set org_name = "**" + org.name + "**" %}
+{% set unique_nodes = org.unique_nodes | string %}
+{% if org.shared_nodes is not none %}
+{% set shared_nodes = org.shared_nodes | string %}
+{% else %}
+{% set shared_nodes = "N/A" %}
+{% endif %}
+{% set unique_licenses = org.unique_licenses | string %}
+{% if org.shared_licenses is not none %}
+{% set shared_licenses = org.shared_licenses | string %}
+{% else %}
+{% set shared_licenses = "N/A" %}
+{% endif %}
+{% else %}
+{% set org_name = org.name %}
+{% set unique_nodes = org.unique_nodes | string + " (" + org.unique_nodes_pct | string + "%)" %}
+{% if org.shared_nodes is not none %}
+{% set shared_nodes = org.shared_nodes | string + " (" + org.shared_nodes_pct | string + "%)" %}
+{% else %}
+{% set shared_nodes = "N/A" %}
+{% endif %}
+{% set unique_licenses = org.unique_licenses | string + " (" + org.unique_licenses_pct | string + "%)" %}
+{% if org.shared_licenses is not none %}
+{% set shared_licenses = org.shared_licenses | string + " (" + org.shared_licenses_pct | string + "%)" %}
+{% else %}
+{% set shared_licenses = "N/A" %}
+{% endif %}
+{% endif %}
+{{ pad(org_name, org_name_width) }}| {{ pad(unique_nodes, col_width) }}| {{ pad(shared_nodes, col_width) }}| {{ pad(unique_licenses, col_width) }}| {{ pad(shared_licenses, col_width) }}
 {% endfor %}
+
 {% if show_node_details | default(true) | bool %}
 ================================================================================
 Node Details by Organization
@@ -21,16 +51,24 @@ Node Details by Organization
 
 Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
 
+{% set node_name_width = 25 %}
+{% set sub_width = 30 %}
+{% set org_col_width = 12 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}| {{ pad(org_name, org_col_width) }}{% endfor %}
+
+{{ "-" * node_name_width }}+ {{ "-" * sub_width }}{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}+ {{ "-" * org_col_width }}{% endfor %}
+
 {% for node in metrics.nodes %}
-Node: {{ node.nodename }}
-  Subscription: {% if node.license %}Yes (consuming subscription){% else %}No (not consuming){% endif %}
-  Organizations:
-{% for org_id in metrics.organization_names.keys() | sort %}
-    - {{ metrics.organization_names[org_id] }}: {% if org_id|int in node.organizations %}Yes (member){% else %}No (not a member){% endif %}
-{% endfor %}
+{% if node.license %}
+{% set subscription = "Yes (consuming)" %}
+{% else %}
+{% set subscription = "No (not consuming)" %}
+{% endif %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}{% if org_id|int in node.organizations %}| {{ pad("Yes", org_col_width) }}{% else %}| {{ pad("No", org_col_width) }}{% endif %}{% endfor %}
 
 {% endfor %}
 {% endif %}
+
 ================================================================================
 Notes
 ================================================================================

@@ -516,6 +516,14 @@ def run_module():
             'shared_licenses_pct': 0.0
         })
 
+        # Sort organizations alphabetically by name, but keep special entries (TOTAL, Orphaned Nodes) at the end
+        regular_orgs = [org for org in org_list if org['id'] is not None and org['id'] != -1]
+        special_orgs = [org for org in org_list if org['id'] is None or org['id'] == -1]
+        regular_orgs.sort(key=lambda x: x['name'].lower())
+        # Sort special orgs: Orphaned Nodes first, then TOTAL
+        special_orgs.sort(key=lambda x: (0 if x['id'] is None else 1, x['name'].lower()))
+        org_list = regular_orgs + special_orgs
+
         # Build node data (convert sets to lists for JSON serialization)
         # All nodenames are lowercase
         # Include all nodes from inventories, plus any subscription-consuming nodes not in inventories

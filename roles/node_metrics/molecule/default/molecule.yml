@@ -1,0 +1,27 @@
+---
+prerun: false
+driver:
+  name: podman
+dependency:
+  name: galaxy
+  enabled: true
+platforms:
+  - name: instance
+    image: registry.access.redhat.com/ubi9-init:latest
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    command: "/lib/systemd/systemd"
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      instance:
+        ansible_python_interpreter: auto
+verifier:
+  name: ansible
+  options:
+    show-diff: true
+...

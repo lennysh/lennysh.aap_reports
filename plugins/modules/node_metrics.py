@@ -37,7 +37,6 @@ options:
             - Password for authentication (optional if token provided)
         required: false
         type: str
-        no_log: true
     validate_certs:
         description:
             - Whether to validate SSL certificates
@@ -45,8 +44,8 @@ options:
         required: false
         type: bool
         default: true
-author:
-    - Lenny Shirley
+author: "Lenny Shirley (@lennysh)"
+...
 '''
 
 EXAMPLES = r'''
@@ -80,6 +79,7 @@ EXAMPLES = r'''
     dest: /tmp/aap_report.md
   vars:
     metrics: "{{ metrics_data.metrics }}"
+...
 '''
 
 RETURN = r'''
@@ -193,10 +193,8 @@ metrics:
     }
 '''
 
-import json
 from datetime import datetime
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
 
 try:
     import requests
@@ -207,7 +205,7 @@ except ImportError:
 
 def detect_api_path(module, url, auth=None, headers=None, verify=True):
     """Detect the correct API path by trying both 2.5+ and 2.4 paths.
-    
+
     Args:
         module: Ansible module instance
         url: Base URL
@@ -226,7 +224,7 @@ def detect_api_path(module, url, auth=None, headers=None, verify=True):
             return "/api/controller/v2"
     except Exception:
         pass
-    
+
     # Fall back to 2.4 path (/api/v2/)
     test_endpoint = "/api/v2/organizations/?page=1&page_size=1"
     try:
@@ -238,14 +236,14 @@ def detect_api_path(module, url, auth=None, headers=None, verify=True):
             return "/api/v2"
     except Exception:
         pass
-    
+
     # If both fail, default to 2.5+ path and let the actual call fail with a better error
     return "/api/controller/v2"
 
 
 def get_all_pages(module, url, endpoint, api_base_path, auth=None, headers=None, verify=True):
     """Fetch all pages from a paginated API endpoint.
-    
+
     Args:
         module: Ansible module instance
         url: Base URL
@@ -257,10 +255,10 @@ def get_all_pages(module, url, endpoint, api_base_path, auth=None, headers=None,
     """
     all_results = []
     page = 1
-    
+
     while True:
         page_url = f"{url}{api_base_path}{endpoint}?page={page}&page_size=200"
-        
+
         try:
             if auth:
                 response = requests.get(page_url, auth=auth, verify=verify, timeout=30)
@@ -270,17 +268,17 @@ def get_all_pages(module, url, endpoint, api_base_path, auth=None, headers=None,
             data = response.json()
         except Exception as e:
             module.fail_json(msg=f"Failed to fetch {endpoint} page {page}: {str(e)}")
-        
+
         if not data.get('results'):
             break
-        
+
         all_results.extend(data['results'])
-        
+
         if not data.get('next'):
             break
-        
+
         page += 1
-    
+
     return all_results
 
 
@@ -289,8 +287,6 @@ def calculate_percentage(value, total):
     if total == 0:
         return 0.0
     return round((value / total) * 100, 1)
-
-
 
 
 def run_module():
@@ -302,30 +298,30 @@ def run_module():
         password=dict(type='str', required=False, no_log=True),
         validate_certs=dict(type='bool', required=False, default=True)
     )
-    
+
     module = AnsibleModule(
         argument_spec=module_args,
         required_one_of=[['token', 'username']],
         required_together=[['username', 'password']],
         supports_check_mode=False
     )
-    
+
     if not HAS_REQUESTS:
         module.fail_json(msg='The requests library is required for this module. Install it with: pip install requests')
-    
+
     url = module.params['url'].rstrip('/')
     token = module.params.get('token')
     username = module.params.get('username')
     password = module.params.get('password')
     validate_certs = module.params.get('validate_certs', True)
-    
+
     try:
         # Determine authentication method and detect API path
         # Prefer token if provided, otherwise use username/password
         auth = None
         headers = None
         api_base_path = None
-        
+
         if token:
             # Use token authentication (preferred)
             headers = {
@@ -340,20 +336,20 @@ def run_module():
         else:
             # This shouldn't happen due to required_one_of validation, but just in case
             module.fail_json(msg="Either token or username/password must be provided")
-        
+
         # Fetch organizations
         organizations = get_all_pages(module, url, "/organizations/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
-        
+
         # Fetch host metrics
         host_metrics = get_all_pages(module, url, "/host_metrics/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
-        
+
         # Fetch inventories
         inventories = get_all_pages(module, url, "/inventories/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
-        
+
         # Build data structures
         org_id_to_name = {org['id']: org['name'] for org in organizations}
         inventory_org_map = {inv['id']: inv['organization'] for inv in inventories}
-        
+
         # Fetch nodes for each inventory
         inventory_nodes = {}
         for inv in inventories:
@@ -363,27 +359,27 @@ def run_module():
                 nodename = node.get('name')
                 if nodename:
                     inventory_nodes[f"{inv_id}:{nodename}"] = True
-        
+
         # Map nodes to organizations (convert all nodenames to lowercase)
         org_nodes_set = {}
         node_to_orgs_set = {}
-        
+
         for key in inventory_nodes.keys():
             inv_id, nodename = key.split(':', 1)
             org_id = inventory_org_map.get(int(inv_id))
-            
+
             if org_id:
                 # Convert to lowercase for everything
                 nodename_lower = nodename.lower()
-                
+
                 if org_id not in org_nodes_set:
                     org_nodes_set[org_id] = set()
                 org_nodes_set[org_id].add(nodename_lower)
-                
+
                 if nodename_lower not in node_to_orgs_set:
                     node_to_orgs_set[nodename_lower] = set()
                 node_to_orgs_set[nodename_lower].add(org_id)
-        
+
         # Map subscription-consuming nodes (convert to lowercase)
         # Only nodes with deleted=False are currently consuming subscriptions
         # deleted=True means the node is NOT consuming a subscription/seat
@@ -394,7 +390,7 @@ def run_module():
             if nodename and not deleted:
                 nodename_lower = nodename.lower()
                 license_nodes_set[nodename_lower] = True
-        
+
         org_license_nodes_set = {}
         for nodename_lower in license_nodes_set.keys():
             if nodename_lower in node_to_orgs_set:
@@ -402,7 +398,7 @@ def run_module():
                     if org_id not in org_license_nodes_set:
                         org_license_nodes_set[org_id] = set()
                     org_license_nodes_set[org_id].add(nodename_lower)
-        
+
         # Calculate organization metrics
         org_list = []
         totals = {
@@ -412,39 +408,39 @@ def run_module():
             'unique_licenses': 0,
             'shared_licenses': 0
         }
-        
+
         # First pass: collect data and calculate totals
         for org in organizations:
             org_id = org['id']
             org_name = org['name']
-            
+
             # Count nodes
             total_nodes = len(org_nodes_set.get(org_id, set()))
             unique_nodes = 0
             shared_nodes = 0
-            
+
             for nodename in org_nodes_set.get(org_id, set()):
                 if len(node_to_orgs_set.get(nodename, set())) > 1:
                     shared_nodes += 1
                 else:
                     unique_nodes += 1
-            
+
             # Count licenses
             unique_licenses = 0
             shared_licenses = 0
-            
+
             for nodename in org_license_nodes_set.get(org_id, set()):
                 if len(node_to_orgs_set.get(nodename, set())) > 1:
                     shared_licenses += 1
                 else:
                     unique_licenses += 1
-            
+
             totals['total_nodes'] += total_nodes
             totals['unique_nodes'] += unique_nodes
             # Don't sum shared_nodes here - we'll count unique shared nodes directly
             totals['unique_licenses'] += unique_licenses
             # Don't sum shared_licenses here - we'll count unique shared licenses directly
-            
+
             # Store org data (percentages calculated in second pass)
             org_list.append({
                 'id': org_id,
@@ -455,13 +451,13 @@ def run_module():
                 'unique_licenses': unique_licenses,
                 'shared_licenses': shared_licenses
             })
-        
+
         # Count orphaned subscription-consuming nodes (consuming subscription but not in any inventory/org)
         orphaned_license_nodes = []
         for nodename_lower in license_nodes_set.keys():
             if nodename_lower not in node_to_orgs_set:
                 orphaned_license_nodes.append(nodename_lower)
-        
+
         orphaned_licenses_count = len(orphaned_license_nodes)
         if orphaned_licenses_count > 0:
             # Add orphaned nodes entry to org_list
@@ -477,18 +473,18 @@ def run_module():
             })
             totals['unique_nodes'] += orphaned_licenses_count
             totals['unique_licenses'] += orphaned_licenses_count
-        
+
         # Count unique shared nodes and licenses directly (not summing from orgs to avoid double-counting)
         # A shared node is one that appears in more than one organization
         for nodename_lower in node_to_orgs_set.keys():
             if len(node_to_orgs_set[nodename_lower]) > 1:
                 totals['shared_nodes'] += 1
-        
+
         # A shared subscription is a subscription-consuming node that appears in more than one organization
         for nodename_lower in license_nodes_set.keys():
             if nodename_lower in node_to_orgs_set and len(node_to_orgs_set[nodename_lower]) > 1:
                 totals['shared_licenses'] += 1
-        
+
         # Second pass: calculate percentages now that totals are known
         for org_entry in org_list:
             org_entry['total_nodes_pct'] = calculate_percentage(org_entry['total_nodes'], totals['total_nodes'])
@@ -503,7 +499,7 @@ def run_module():
                 org_entry['shared_licenses_pct'] = calculate_percentage(org_entry['shared_licenses'], totals['shared_licenses'])
             else:
                 org_entry['shared_licenses_pct'] = None
-        
+
         # Add TOTAL row at the end (no percentages for totals row)
         org_list.append({
             'id': -1,  # Special ID for totals row
@@ -519,7 +515,7 @@ def run_module():
             'unique_licenses_pct': 0.0,
             'shared_licenses_pct': 0.0
         })
-        
+
         # Build node data (convert sets to lists for JSON serialization)
         # All nodenames are lowercase
         # Include all nodes from inventories, plus any subscription-consuming nodes not in inventories
@@ -537,7 +533,7 @@ def run_module():
                 'license': nodename_lower in license_nodes_set,
                 'organizations': sorted(org_ids)
             })
-        
+
         # Build metrics data structure
         metrics = {
             'generated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
@@ -547,14 +543,14 @@ def run_module():
             'nodes': nodes_list,
             'organization_names': org_id_to_name
         }
-        
+
         module.exit_json(
             changed=True,
             organizations_count=len(organizations),
             nodes_count=len(nodes_list),
             metrics=metrics
         )
-    
+
     except Exception as e:
         module.fail_json(msg=f"Error generating report: {str(e)}")
 

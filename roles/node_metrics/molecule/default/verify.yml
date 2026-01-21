@@ -1,0 +1,21 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  vars:
+    node_metrics_output_folder: "/tmp"
+    node_metrics_output_filename: "aap_node_metrics_report"
+  tasks:
+    - name: Check that report files were created
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ node_metrics_output_folder }}/{{ node_metrics_output_filename }}.md"
+      register: node_metrics_report_files
+      failed_when: false
+
+    - name: Display report file status
+      ansible.builtin.debug:
+        msg: "Report file {{ item.item }} exists: {{ item.stat.exists }}"
+      loop: "{{ node_metrics_report_files.results }}"
+...

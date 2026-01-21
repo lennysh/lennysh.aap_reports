@@ -1,7 +1,7 @@
 # Ansible Automation Platform Node Metrics Report
 
 **AAP Instance:** https://aap.example.com  
-**Generated:** 2026-01-20 19:19:08 UTC
+**Generated:** 2026-01-20 21:21:55 UTC
 
 ## Organization Node and Subscription Metrics
 

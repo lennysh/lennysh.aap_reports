@@ -13,6 +13,7 @@ The `node_metrics` module connects to the Ansible Automation Platform (AAP) Cont
 **Description:**
 Collects node metrics data from AAP Controller including:
 - Organization-level node counts (total, unique, shared)
+- Maximum hosts limit per organization (max_hosts field from API, 0 = Unlimited)
 - Subscription consumption metrics (unique, shared)
 - Detailed node information with organization membership
 - Subscription consumption status per node
@@ -39,6 +40,7 @@ metrics:
   generated_at: "2026-01-20 15:36:54 UTC"
   organizations:
     - name: "Default"
+      max_hosts: 20
       total_nodes: 4
       total_nodes_pct: 44.4
       unique_nodes: 3

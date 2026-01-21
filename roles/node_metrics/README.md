@@ -181,16 +181,18 @@ Example reports in all supported formats are available in the [`report_examples/
 All formats contain the same data, structured as follows:
 
 ### Organization Metrics
+- **Max Nodes**: Maximum number of hosts allowed for the organization (0 = Unlimited, shown as "Unlimited" in reports)
 - Total nodes per organization with percentage of total
 - Unique nodes (only in that organization) with percentage
 - Shared nodes (in multiple organizations) with percentage
 - Unique subscriptions (subscription-consuming nodes unique to org) with percentage
 - Shared subscriptions (subscription-consuming nodes shared across orgs) with percentage
+- Organizations are sorted alphabetically by name
 
 ### Node Details
 - Complete list of all nodes
 - Subscription consumption status for each node
-- Organization membership matrix showing which nodes belong to which organizations
+- **Organizations**: Comma-delimited list of organization names that each node belongs to (sorted alphabetically)
 
 ## License
 

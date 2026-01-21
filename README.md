@@ -33,7 +33,7 @@ This collection includes the following roles:
 
 | Role | Description | Documentation |
 |------|-------------|---------------|
-| `lennysh.aap_reports.node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Collects organization-level node and subscription metrics, shows unique vs shared nodes/subscriptions, and provides detailed node-by-node breakdowns with organization membership. | [Role README](roles/node_metrics/README.md) |
+| `lennysh.aap_reports.node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Collects organization-level node and subscription metrics including max hosts limits, shows unique vs shared nodes/subscriptions, and provides detailed node-by-node breakdowns with organization membership displayed as comma-delimited lists. | [Role README](roles/node_metrics/README.md) |
 
 ## Plugins
 

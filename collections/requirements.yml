@@ -1,0 +1,7 @@
+---
+collections:
+  - name: lennysh.aap_reports
+    source: https://github.com/lennysh/lennysh.aap_reports.git
+    type: git
+    version: devel
+...

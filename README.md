@@ -1,5 +1,7 @@
 # Ansible Collection - lennysh.aap_reports
 
+[![GitHub last commit](https://img.shields.io/github/last-commit/lennysh/lennysh.aap_reports.svg)](https://github.com/lennysh/lennysh.aap_reports/commits/main) [![GitHub license](https://img.shields.io/github/license/lennysh/lennysh.aap_reports.svg)](https://github.com/lennysh/lennysh.aap_reports/blob/main/LICENSE) [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/lennysh/lennysh.aap_reports/pulls) ![GitHub contributors](https://img.shields.io/github/contributors/lennysh/lennysh.aap_reports) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lennysh/lennysh.aap_reports/tests.yml) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/lennysh/lennysh.aap_reports)
+
 This Ansible collection provides tools to generate reports from Ansible Automation Platform (AAP) Controller.
 
 ## Requirements

@@ -79,6 +79,7 @@ EXAMPLES = r'''
     dest: /tmp/aap_report.md
   vars:
     metrics: "{{ metrics_data.metrics }}"
+...
 '''
 
 RETURN = r'''

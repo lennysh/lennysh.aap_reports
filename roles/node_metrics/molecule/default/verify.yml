@@ -15,3 +15,4 @@
       ansible.builtin.debug:
         msg: "Report file {{ item.item }} exists: {{ item.stat.exists }}"
       loop: "{{ node_metrics_report_files.results }}"
+...

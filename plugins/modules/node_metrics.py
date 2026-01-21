@@ -45,6 +45,7 @@ options:
         type: bool
         default: true
 author: "Lenny Shirley (@lennysh)"
+...
 '''
 
 EXAMPLES = r'''

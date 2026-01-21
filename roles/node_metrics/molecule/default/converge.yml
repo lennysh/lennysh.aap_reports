@@ -13,3 +13,4 @@
         node_metrics_output_formats:
           - markdown
       # Note: This will fail without actual AAP instance, but tests role structure
+...

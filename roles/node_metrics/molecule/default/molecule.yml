@@ -24,3 +24,4 @@ verifier:
   name: ansible
   options:
     show-diff: true
+...

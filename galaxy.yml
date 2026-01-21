@@ -1,6 +1,6 @@
 namespace: lennysh
 name: aap_reports
-version: 1.0.2-devel
+version: 1.0.3-devel
 readme: README.md
 authors:
   - Lenny Shirley @lennysh
@@ -21,25 +21,20 @@ repository: https://github.com/lennysh/lennysh.aap_reports
 documentation: https://github.com/lennysh/lennysh.aap_reports/blob/devel/README.md
 issues: https://github.com/lennysh/lennysh.aap_reports/issues
 build_ignore:
-  - __pycache__/
-  - ignore_other/
-  - report_examples/
-  - vars.yml
-  - .github/
-  - docs/
-  - tests/
-  - changelogs/
-  - test-requirements.txt
-  - tox-ansible.ini
-  - test-workflow.txt
-  - .ansible-lint
-  - .ansible-lint-ignore
-  - .yamllint.yml
-  - .pre-commit-config.yaml
-  - .prettierignore
+  - __pycache__
+  - .*
+  - changelogs
+  - collections
+  - docs
+  - ignore_other
+  - playbooks
   - pyproject.toml
-  - collections/
-  - playbooks/
-  - roles/*/molecule/
-  - roles/*/tests/
+  - report_examples
+  - roles/*/molecule
+  - roles/*/tests
+  - test-requirements.txt
+  - test-workflow.txt
+  - tests
+  - tox-ansible.ini
+  - vars.yml
 ...

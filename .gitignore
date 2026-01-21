@@ -33,5 +33,17 @@ build/
 *.tar.gz
 .galaxy_build/
 
+# Test artifacts
+.tox/
+.pytest_cache/
+.molecule/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Test files
+test-workflow.txt
+
 # Ignore directories
 ignore_*

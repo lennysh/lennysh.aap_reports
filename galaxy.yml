@@ -27,4 +27,19 @@ build_ignore:
   - vars.yml
   - .github/
   - docs/
+  - tests/
+  - changelogs/
+  - test-requirements.txt
+  - tox-ansible.ini
+  - test-workflow.txt
+  - .ansible-lint
+  - .ansible-lint-ignore
+  - .yamllint.yml
+  - .pre-commit-config.yaml
+  - .prettierignore
+  - pyproject.toml
+  - collections/
+  - playbooks/
+  - roles/*/molecule/
+  - roles/*/tests/
 ...

@@ -1,0 +1,14 @@
+---
+# Ansible Lint configuration
+# Exclude role-name[path] rule for molecule test files
+# Relative paths (../..) are the standard way to reference roles in molecule tests
+exclude_paths:
+  - .cache
+  - .github
+  - .tox
+  - molecule/*/converge.yml
+  - molecule/*/verify.yml
+
+# Skip specific rules for molecule test files
+skip_list:
+  - role-name[path]  # Allow relative paths in molecule tests

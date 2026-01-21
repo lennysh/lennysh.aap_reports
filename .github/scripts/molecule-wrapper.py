@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Wrapper script to bypass molecule 25.x schema validation issue.
 This patches molecule's _validate method to skip schema validation errors.

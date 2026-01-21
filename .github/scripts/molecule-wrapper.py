@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 """
 Wrapper script to bypass molecule 25.x schema validation issue.
 This patches molecule's _validate method to skip schema validation errors.
@@ -137,3 +137,4 @@ if __name__ == '__main__':
             print(f"⚠️  Schema validation error (known molecule 25.x issue): {e}", file=sys.stderr)
             sys.exit(1)
         raise
+

@@ -2,11 +2,12 @@
   "report": {
     "title": "Ansible Automation Platform Node Metrics Report",
     "aap_url": "https://aap.example.com",
-    "generated_at": "2026-01-21 20:08:33 UTC"
+    "generated_at": "2026-01-21 21:46:54 UTC"
   },
   "organizations": [
     {
       "name": "Default",
+      "max_nodes": 20,
       "total_nodes": 5,
       "total_nodes_pct": 50.0,
       "unique_nodes": 4,
@@ -20,6 +21,7 @@
     },
     {
       "name": "DEMOLab",
+      "max_nodes": "Unlimited",
       "total_nodes": 5,
       "total_nodes_pct": 50.0,
       "unique_nodes": 4,
@@ -33,6 +35,7 @@
     },
     {
       "name": "Orphaned Nodes (No Organization)",
+      "max_nodes": null,
       "total_nodes": 0,
       "total_nodes_pct": 0.0,
       "unique_nodes": 1,
@@ -46,6 +49,7 @@
     },
     {
       "name": "TOTAL",
+      "max_nodes": null,
       "total_nodes": 10,
       "total_nodes_pct": 0.0,
       "unique_nodes": 9,

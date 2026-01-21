@@ -1,17 +1,17 @@
 Ansible Automation Platform Node Metrics Report
 AAP Instance: https://aap.example.com
-Generated: 2026-01-21 20:08:33 UTC
+Generated: 2026-01-21 21:46:54 UTC
 
 ================================================================================
 Organization Node and Subscription Metrics
 ================================================================================
 
-Organization Name                       | Unique Nodes      | Shared Nodes      | Unique Subs       | Shared Subs       
-----------------------------------------+ ------------------+ ------------------+ ------------------+ ------------------
-Default                                 | 4 (44.4%)         | 1 (100.0%)        | 3 (37.5%)         | 1 (100.0%)        
-DEMOLab                                 | 4 (44.4%)         | 1 (100.0%)        | 4 (50.0%)         | 1 (100.0%)        
-Orphaned Nodes (No Organization)        | 1 (11.1%)         | N/A               | 1 (12.5%)         | N/A               
-**TOTAL**                               | 9                 | 1                 | 8                 | 1                 
+Organization Name                       | Max Nodes         | Unique Nodes      | Shared Nodes      | Unique Subs       | Shared Subs       
+----------------------------------------+ ------------------+ ------------------+ ------------------+ ------------------+ ------------------
+Default                                 | 20                | 4 (44.4%)         | 1 (100.0%)        | 3 (37.5%)         | 1 (100.0%)        
+DEMOLab                                 | Unlimited         | 4 (44.4%)         | 1 (100.0%)        | 4 (50.0%)         | 1 (100.0%)        
+Orphaned Nodes (No Organization)        | N/A               | 1 (11.1%)         | N/A               | 1 (12.5%)         | N/A               
+**TOTAL**                               | N/A               | 9                 | 1                 | 8                 | 1                 
 
 ================================================================================
 Node Details by Organization
@@ -19,18 +19,18 @@ Node Details by Organization
 
 Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
 
-Node Name                | Subscription                  | Default     | DEMOLab     
--------------------------+ ------------------------------+ ------------+ ------------
-db                       | Yes (consuming)               | No          | Yes         
-en                       | Yes (consuming)               | No          | Yes         
-gw                       | Yes (consuming)               | No          | Yes         
-localhost                | Yes (consuming)               | No          | Yes         
-rhel-demo-01             | Yes (consuming)               | Yes         | No          
-rhel-demo-02             | Yes (consuming)               | Yes         | No          
-rhel-demo-03             | Yes (consuming)               | Yes         | No          
-windows2025-demo         | Yes (consuming)               | Yes         | Yes         
-windows2025-demo-02      | No (not consuming)            | Yes         | No          
-windows2025-test         | Yes (consuming)               | No          | No          
+Node Name                | Subscription                  | Organizations                                     
+-------------------------+ ------------------------------+ --------------------------------------------------
+db                       | Yes (consuming)               | DEMOLab
+en                       | Yes (consuming)               | DEMOLab
+gw                       | Yes (consuming)               | DEMOLab
+localhost                | Yes (consuming)               | DEMOLab
+rhel-demo-01             | Yes (consuming)               | Default
+rhel-demo-02             | Yes (consuming)               | Default
+rhel-demo-03             | Yes (consuming)               | Default
+windows2025-demo         | Yes (consuming)               | Default, DEMOLab
+windows2025-demo-02      | No (not consuming)            | Default
+windows2025-test         | Yes (consuming)               | None
 
 ================================================================================
 Notes

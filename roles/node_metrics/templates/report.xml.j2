@@ -8,6 +8,7 @@
 {% for org in metrics.organizations %}
         <organization>
             <name>{{ org.name }}</name>
+            <max_nodes>{% if org.max_hosts is none %}{% elif org.max_hosts == 0 %}Unlimited{% else %}{{ org.max_hosts }}{% endif %}</max_nodes>
             <total_nodes value="{{ org.total_nodes }}" percentage="{{ org.total_nodes_pct }}"/>
             <unique_nodes value="{{ org.unique_nodes }}" percentage="{{ org.unique_nodes_pct }}"/>
 {% if org.shared_nodes is not none %}

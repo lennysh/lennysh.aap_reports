@@ -2,11 +2,12 @@
 <report>
     <title>Ansible Automation Platform Node Metrics Report</title>
     <aap_url>https://aap.example.com</aap_url>
-    <generated_at>2026-01-21 20:08:33 UTC</generated_at>
+    <generated_at>2026-01-21 21:46:54 UTC</generated_at>
     
     <organizations>
         <organization>
             <name>Default</name>
+            <max_nodes>20</max_nodes>
             <total_nodes value="5" percentage="50.0"/>
             <unique_nodes value="4" percentage="44.4"/>
             <shared_nodes value="1" percentage="100.0"/>
@@ -15,6 +16,7 @@
         </organization>
         <organization>
             <name>DEMOLab</name>
+            <max_nodes>Unlimited</max_nodes>
             <total_nodes value="5" percentage="50.0"/>
             <unique_nodes value="4" percentage="44.4"/>
             <shared_nodes value="1" percentage="100.0"/>
@@ -23,12 +25,14 @@
         </organization>
         <organization>
             <name>Orphaned Nodes (No Organization)</name>
+            <max_nodes></max_nodes>
             <total_nodes value="0" percentage="0.0"/>
             <unique_nodes value="1" percentage="11.1"/>
             <unique_licenses value="1" percentage="12.5"/>
         </organization>
         <organization>
             <name>TOTAL</name>
+            <max_nodes></max_nodes>
             <total_nodes value="10" percentage="0.0"/>
             <unique_nodes value="9" percentage="0.0"/>
             <shared_nodes value="1" percentage="0.0"/>

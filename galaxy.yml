@@ -12,10 +12,10 @@ tags:
   - aap
   - reports
   - automation
-  - automationplatform
+  - platform
   - ansible
-  - ansiblecollection
-  - ansiblegalaxy
+  - metrics
+  - subscription
 dependencies: {}
 repository: https://github.com/lennysh/lennysh.aap_reports
 documentation: https://github.com/lennysh/lennysh.aap_reports/blob/devel/README.md

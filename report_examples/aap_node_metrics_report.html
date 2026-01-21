@@ -162,6 +162,10 @@
         .notes li strong {
             color: rgba(0, 0, 0, 0.9);
         }
+        /* Node details table - Organizations column left-aligned */
+        .node-details-table td:nth-child(3) {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -170,7 +174,7 @@
         <h1>Ansible Automation Platform Node Metrics Report</h1>
         <div class="generated">
             <strong>AAP Instance:</strong> https://aap.example.com<br>
-            <strong>Generated:</strong> 2026-01-21 20:08:33 UTC
+            <strong>Generated:</strong> 2026-01-21 21:46:54 UTC
         </div>
 
         <h2>Organization Node and Subscription Metrics</h2>
@@ -179,6 +183,7 @@
             <thead>
                 <tr>
                     <th>Organization</th>
+                    <th>Max Nodes</th>
                     <th>Unique Nodes</th>
                     <th>Shared Nodes</th>
                     <th>Unique Subscriptions</th>
@@ -186,29 +191,33 @@
                 </tr>
             </thead>
             <tbody>
-                                <tr>
+                                                                                <tr>
                     <td>Default</td>
+                    <td>20</td>
                     <td>4 (44.4%)</td>
                     <td>1 (100.0%)</td>
                     <td>3 (37.5%)</td>
                     <td>1 (100.0%)</td>
                 </tr>
-                                <tr>
+                                                                                <tr>
                     <td>DEMOLab</td>
+                    <td>Unlimited</td>
                     <td>4 (44.4%)</td>
                     <td>1 (100.0%)</td>
                     <td>4 (50.0%)</td>
                     <td>1 (100.0%)</td>
                 </tr>
-                                <tr>
+                                                                                <tr>
                     <td>Orphaned Nodes (No Organization)</td>
+                    <td></td>
                     <td>1 (11.1%)</td>
                     <td></td>
                     <td>1 (12.5%)</td>
                     <td></td>
                 </tr>
-                                <tr class="total-row">
+                                                                                <tr class="total-row">
                     <td style="font-weight: 600;">TOTAL</td>
+                    <td></td>
                     <td>9</td>
                     <td>1</td>
                     <td>8</td>
@@ -222,106 +231,95 @@
             Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
         </div>
         <div class="table-wrapper">
-        <table>
+        <table class="node-details-table">
             <thead>
                 <tr>
                     <th>Node</th>
                     <th>Subscription</th>
-                                        <th>Default</th>
-                                        <th>DEMOLab</th>
-                                    </tr>
+                    <th>Organizations</th>
+                </tr>
             </thead>
             <tbody>
                                 <tr>
                     <td>db</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        DEMOLab
+                                            </td>
+                </tr>
                                 <tr>
                     <td>en</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        DEMOLab
+                                            </td>
+                </tr>
                                 <tr>
                     <td>gw</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        DEMOLab
+                                            </td>
+                </tr>
                                 <tr>
                     <td>localhost</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        DEMOLab
+                                            </td>
+                </tr>
                                 <tr>
                     <td>rhel-demo-01</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        Default
+                                            </td>
+                </tr>
                                 <tr>
                     <td>rhel-demo-02</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        Default
+                                            </td>
+                </tr>
                                 <tr>
                     <td>rhel-demo-03</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        Default
+                                            </td>
+                </tr>
                                 <tr>
                     <td>windows2025-demo</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                                                                        Default, DEMOLab
+                                            </td>
+                </tr>
                                 <tr>
                     <td>windows2025-demo-02</td>
                     <td class="check-red">
                         ✗                    </td>
-                                        <td class="check-green">
-                        ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                                                                                        Default
+                                            </td>
+                </tr>
                                 <tr>
                     <td>windows2025-test</td>
                     <td class="check-green">
                         ✓                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                        <td class="check-red">
-                        ✗                    </td>
-                                    </tr>
+                    <td>
+                                                                                                                                                                                                                                                                                                <span style="color: rgba(0, 0, 0, 0.5);">None</span>
+                                            </td>
+                </tr>
                             </tbody>
         </table>
         </div>

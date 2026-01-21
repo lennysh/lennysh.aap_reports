@@ -5,25 +5,45 @@
 
 ## Organization Node and Subscription Metrics
 
-| Organization | Unique Nodes | Shared Nodes | Unique Subscriptions | Shared Subscriptions |
-|--------------|--------------|--------------|-----------------|-----------------|
+| Organization | Max Nodes | Unique Nodes | Shared Nodes | Unique Subscriptions | Shared Subscriptions |
+|--------------|-----------|--------------|--------------|-----------------|-----------------|
 {% for org in metrics.organizations %}
-| {% if org.id == -1 %}**{{ org.name }}**{% else %}{{ org.name }}{% endif %} | {% if org.id == -1 %}{{ org.unique_nodes }}{% else %}{{ org.unique_nodes }} ({{ org.unique_nodes_pct }}%){% endif %} | {% if org.shared_nodes is none %}{% elif org.id == -1 %}{{ org.shared_nodes }}{% else %}{{ org.shared_nodes }} ({{ org.shared_nodes_pct }}%){% endif %} | {% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %} | {% if org.shared_licenses is none %}{% elif org.id == -1 %}{{ org.shared_licenses }}{% else %}{{ org.shared_licenses }} ({{ org.shared_licenses_pct }}%){% endif %} |
+{% if org.max_hosts is none %}
+{% set max_hosts_display = "" %}
+{% elif org.max_hosts == 0 %}
+{% set max_hosts_display = "Unlimited" %}
+{% else %}
+{% set max_hosts_display = org.max_hosts | string %}
+{% endif %}
+| {% if org.id == -1 %}**{{ org.name }}**{% else %}{{ org.name }}{% endif %} | {{ max_hosts_display }} | {% if org.id == -1 %}{{ org.unique_nodes }}{% else %}{{ org.unique_nodes }} ({{ org.unique_nodes_pct }}%){% endif %} | {% if org.shared_nodes is none %}{% elif org.id == -1 %}{{ org.shared_nodes }}{% else %}{{ org.shared_nodes }} ({{ org.shared_nodes_pct }}%){% endif %} | {% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %} | {% if org.shared_licenses is none %}{% elif org.id == -1 %}{{ org.shared_licenses }}{% else %}{{ org.shared_licenses }} ({{ org.shared_licenses_pct }}%){% endif %} |
 {% endfor %}
 {% if show_node_details | default(true) | bool %}
+
 ## Node Details by Organization
 
 Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
 
-| Node | Subscription |{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %} {{ org_name }} |{% endfor %}
-
-|------|---------|{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}------|{% endfor %}
-
+| Node | Subscription | Organizations |
+|------|---------|--------------|
 {% for node in metrics.nodes %}
-| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% for org_id, org_name in metrics.organization_names | dictsort(by="value") %} {% if org_id|int in node.organizations %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} |{% endfor %}
-
+{% set org_names_parts = [] %}
+{% if node.organizations is defined and node.organizations is not none %}
+{% for org_id, org_name in metrics.organization_names.items() %}
+{% set org_id_int = org_id | int %}
+{% if org_id_int in node.organizations %}
+{% set _ = org_names_parts.append(org_name) %}
+{% endif %}
 {% endfor %}
 {% endif %}
+{% if org_names_parts | length > 0 %}
+{% set org_names = org_names_parts | sort | join(", ") %}
+{% else %}
+{% set org_names = "None" %}
+{% endif %}
+| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} | {{ org_names }} |
+{% endfor %}
+{% endif %}
+
 ## Notes
 
 - **Unique Nodes**: Nodes that exist only in this organization

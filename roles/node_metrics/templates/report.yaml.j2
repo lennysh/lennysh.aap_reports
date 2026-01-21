@@ -7,6 +7,8 @@ report:
 organizations:
 {% for org in metrics.organizations %}
   - name: "{{ org.name }}"
+    max_nodes: {% if org.max_hosts is none %}null{% elif org.max_hosts == 0 %}"Unlimited"{% else %}{{ org.max_hosts }}{% endif %}
+
     total_nodes: {{ org.total_nodes }}
     total_nodes_pct: {{ org.total_nodes_pct }}
     unique_nodes: {{ org.unique_nodes }}

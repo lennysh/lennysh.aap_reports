@@ -413,6 +413,7 @@ def run_module():
         for org in organizations:
             org_id = org['id']
             org_name = org['name']
+            max_hosts = org.get('max_hosts', 0)
 
             # Count nodes
             total_nodes = len(org_nodes_set.get(org_id, set()))
@@ -445,6 +446,7 @@ def run_module():
             org_list.append({
                 'id': org_id,
                 'name': org_name,
+                'max_hosts': max_hosts,
                 'total_nodes': total_nodes,
                 'unique_nodes': unique_nodes,
                 'shared_nodes': shared_nodes,
@@ -465,6 +467,7 @@ def run_module():
             org_list.append({
                 'id': None,  # No organization ID for orphaned nodes
                 'name': 'Orphaned Nodes (No Organization)',
+                'max_hosts': None,  # Not applicable for orphaned nodes
                 'total_nodes': 0,  # Not in any inventory
                 'unique_nodes': orphaned_licenses_count,  # Match unique licenses count
                 'shared_nodes': None,  # Empty/blank for orphaned nodes
@@ -504,6 +507,7 @@ def run_module():
         org_list.append({
             'id': -1,  # Special ID for totals row
             'name': 'TOTAL',
+            'max_hosts': None,  # Not applicable for totals row
             'total_nodes': totals['total_nodes'],
             'unique_nodes': totals['unique_nodes'],
             'shared_nodes': totals['shared_nodes'],

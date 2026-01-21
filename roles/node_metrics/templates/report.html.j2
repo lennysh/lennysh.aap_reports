@@ -162,6 +162,10 @@
         .notes li strong {
             color: rgba(0, 0, 0, 0.9);
         }
+        /* Node details table - Organizations column left-aligned */
+        .node-details-table td:nth-child(3) {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -179,6 +183,7 @@
             <thead>
                 <tr>
                     <th>Organization</th>
+                    <th>Max Nodes</th>
                     <th>Unique Nodes</th>
                     <th>Shared Nodes</th>
                     <th>Unique Subscriptions</th>
@@ -187,8 +192,16 @@
             </thead>
             <tbody>
                 {% for org in metrics.organizations %}
+                {% if org.max_hosts is none %}
+                {% set max_hosts_display = "" %}
+                {% elif org.max_hosts == 0 %}
+                {% set max_hosts_display = "Unlimited" %}
+                {% else %}
+                {% set max_hosts_display = org.max_hosts | string %}
+                {% endif %}
                 <tr{% if org.id == -1 %} class="total-row"{% endif %}>
                     <td{% if org.id == -1 %} style="font-weight: 600;"{% endif %}>{{ org.name }}</td>
+                    <td>{{ max_hosts_display }}</td>
                     <td>{% if org.id == -1 %}{{ org.unique_nodes }}{% else %}{{ org.unique_nodes }} ({{ org.unique_nodes_pct }}%){% endif %}</td>
                     <td>{% if org.shared_nodes is none %}{% elif org.id == -1 %}{{ org.shared_nodes }}{% else %}{{ org.shared_nodes }} ({{ org.shared_nodes_pct }}%){% endif %}</td>
                     <td>{% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %}</td>
@@ -204,14 +217,12 @@
             Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (green ✓ = member, red ✗ = not a member).
         </div>
         <div class="table-wrapper">
-        <table>
+        <table class="node-details-table">
             <thead>
                 <tr>
                     <th>Node</th>
                     <th>Subscription</th>
-                    {% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}
-                    <th>{{ org_name }}</th>
-                    {% endfor %}
+                    <th>Organizations</th>
                 </tr>
             </thead>
             <tbody>
@@ -221,11 +232,23 @@
                     <td class="{% if node.license %}check-green{% else %}check-red{% endif %}">
                         {% if node.license %}✓{% else %}✗{% endif %}
                     </td>
-                    {% for org_id, org_name in metrics.organization_names | dictsort(by="value") %}
-                    <td class="{% if org_id|int in node.organizations %}check-green{% else %}check-red{% endif %}">
-                        {% if org_id|int in node.organizations %}✓{% else %}✗{% endif %}
+                    <td>
+                        {% set org_names_parts = [] %}
+                        {% if node.organizations is defined and node.organizations is not none %}
+                        {% for org_id, org_name in metrics.organization_names.items() %}
+                        {% set org_id_int = org_id | int %}
+                        {% if org_id_int in node.organizations %}
+                        {% set _ = org_names_parts.append(org_name) %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% if org_names_parts | length > 0 %}
+                        {% set org_names = org_names_parts | sort | join(", ") %}
+                        {{ org_names }}
+                        {% else %}
+                        <span style="color: rgba(0, 0, 0, 0.5);">None</span>
+                        {% endif %}
                     </td>
-                    {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>

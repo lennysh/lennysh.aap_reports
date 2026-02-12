@@ -1,0 +1,72 @@
+---
+# Playbook to populate an AAP Controller with dummy organizations, inventories, and hosts.
+# Use this for testing node metrics reports and license/subscription behavior
+# (e.g. same hostname in multiple orgs with different casing counts as one subscription).
+#
+# Required: Set aap_url, and either aap_token OR aap_username + aap_password.
+# Optional: Override org_count, hosts_count, inventories_per_org, hostname_casing,
+#           multi_org_percent, allow_same_name_different_casing, even_host_distribution,
+#           disabled_host_percent (see module docs).
+- name: Populate AAP with dummy orgs, inventories, and hosts
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Ensure aap_url is set
+      ansible.builtin.assert:
+        that: aap_url is defined and aap_url | length > 0
+        fail_msg: "aap_url must be set (e.g. https://aap.example.com)."
+      tags: always
+
+    - name: Fail when username is set without password
+      ansible.builtin.fail:
+        msg: "When using username/password auth, both aap_username and aap_password must be set. aap_password is missing or empty."
+      when:
+        - aap_username is defined
+        - aap_username | default('') | string | length > 0
+        - aap_password is not defined or (aap_password | default('') | string | length == 0)
+        - aap_token is not defined or (aap_token | default('') | string | length == 0)
+      tags: always
+
+    - name: Fail when password is set without username
+      ansible.builtin.fail:
+        msg: "When using username/password auth, both aap_username and aap_password must be set. aap_username is missing or empty."
+      when:
+        - aap_password is defined
+        - aap_password | default('') | string | length > 0
+        - aap_username is not defined or (aap_username | default('') | string | length == 0)
+        - aap_token is not defined or (aap_token | default('') | string | length == 0)
+      tags: always
+
+    - name: Fail when no valid auth is provided
+      ansible.builtin.fail:
+        msg: "Set either aap_token OR both aap_username and aap_password to authenticate to AAP."
+      when: >
+        (aap_token is not defined or (aap_token | default('') | string | length == 0))
+        and (
+          aap_username is not defined or (aap_username | default('') | string | length == 0)
+          or aap_password is not defined or (aap_password | default('') | string | length == 0)
+        )
+      tags: always
+
+    - name: Populate dummy organizations, inventories, and hosts
+      lennysh.aap_reports.aap_populate_dummy:
+        url: "{{ aap_url }}"
+        token: "{{ aap_token | default(omit) }}"
+        username: "{{ aap_username | default(omit) }}"
+        password: "{{ aap_password | default(omit) }}"
+        org_count: "{{ org_count }}"
+        hosts_count: "{{ hosts_count }}"
+        inventories_per_org: "{{ inventories_per_org | default(1) }}"
+        hostname_casing: "{{ hostname_casing | default('mixed') }}"
+        multi_org_percent: "{{ multi_org_percent | default(0) }}"
+        allow_same_name_different_casing: "{{ allow_same_name_different_casing | default(false) }}"
+        even_host_distribution: "{{ even_host_distribution | default(false) }}"
+        disabled_host_percent: "{{ disabled_host_percent | default(0) }}"
+        validate_certs: "{{ aap_validate_certs | default(true) }}"
+      register: populate_result
+
+    - name: Show populate summary
+      ansible.builtin.debug:
+        msg: "Created {{ populate_result.organizations_created }} orgs, {{ populate_result.inventories_created }} inventories, {{ populate_result.hosts_created }} host records."
+      when: populate_result is changed

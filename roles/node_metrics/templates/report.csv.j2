@@ -22,20 +22,27 @@ Node Details by Organization
 
 Node,Subscription,Organizations
 {% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
 {% set org_names_parts = [] %}
-{% if node.organizations is defined and node.organizations is not none %}
 {% for org_id, org_name in metrics.organization_names.items() %}
 {% set org_id_int = org_id | int %}
 {% if org_id_int in node.organizations %}
 {% set _ = org_names_parts.append(org_name) %}
 {% endif %}
 {% endfor %}
-{% endif %}
-{% if org_names_parts | length > 0 %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-{% else %}
-{% set org_names = "None" %}
-{% endif %}
 {{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %},"{{ org_names }}"
+{% endif %}
+{% endfor %}
+
+Orphaned Nodes (nodes consuming a subscription but not in any organization)
+
+Node
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+{{ node.nodename }}
+{% endif %}
 {% endfor %}
 {% endif %}

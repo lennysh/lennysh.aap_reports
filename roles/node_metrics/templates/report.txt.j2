@@ -63,7 +63,7 @@ Organization Node and Subscription Metrics
 Node Details by Organization
 ================================================================================
 
-Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
+Nodes that have at least one organization, with subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
 
 {% set node_name_width = 25 %}
 {% set sub_width = 30 %}
@@ -71,26 +71,38 @@ Shows all nodes with their subscription consumption status (green ✓ = consumin
 {{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}
 {{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}
 {% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
 {% if node.license %}
 {% set subscription = "Yes (consuming)" %}
 {% else %}
 {% set subscription = "No (not consuming)" %}
 {% endif %}
 {% set org_names_parts = [] %}
-{% if node.organizations is defined and node.organizations is not none %}
 {% for org_id, org_name in metrics.organization_names.items() %}
 {% set org_id_int = org_id | int %}
 {% if org_id_int in node.organizations %}
 {% set _ = org_names_parts.append(org_name) %}
 {% endif %}
 {% endfor %}
-{% endif %}
-{% if org_names_parts | length > 0 %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-{% else %}
-{% set org_names = "None" %}
-{% endif %}
 {{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ org_names }}
+{% endif %}
+{% endfor %}
+
+================================================================================
+Orphaned Nodes
+================================================================================
+
+Nodes that are currently consuming a subscription but do not belong to any organization.
+
+{{ pad("Node Name", node_name_width) }}
+{{ "-" * node_name_width }}
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+{{ pad(node.nodename, node_name_width) }}
+{% endif %}
 {% endfor %}
 {% endif %}
 

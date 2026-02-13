@@ -214,7 +214,7 @@
 {% if show_node_details | default(true) | bool %}
         <h2>Node Details by Organization</h2>
         <div class="description">
-            Shows all nodes with their subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
+            Nodes that have at least one organization, with subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
         </div>
         <div class="table-wrapper">
         <table class="node-details-table">
@@ -227,6 +227,8 @@
             </thead>
             <tbody>
                 {% for node in metrics.nodes %}
+                {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+                {% if has_orgs %}
                 <tr>
                     <td>{{ node.nodename }}</td>
                     <td class="{% if node.license %}check-green{% else %}check-red{% endif %}">
@@ -234,22 +236,40 @@
                     </td>
                     <td>
                         {% set org_names_parts = [] %}
-                        {% if node.organizations is defined and node.organizations is not none %}
                         {% for org_id, org_name in metrics.organization_names.items() %}
                         {% set org_id_int = org_id | int %}
                         {% if org_id_int in node.organizations %}
                         {% set _ = org_names_parts.append(org_name) %}
                         {% endif %}
                         {% endfor %}
-                        {% endif %}
-                        {% if org_names_parts | length > 0 %}
                         {% set org_names = org_names_parts | sort | join(", ") %}
                         {{ org_names }}
-                        {% else %}
-                        <span style="color: rgba(0, 0, 0, 0.5);">None</span>
-                        {% endif %}
                     </td>
                 </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <h2>Orphaned Nodes</h2>
+        <div class="description">
+            Nodes that are currently consuming a subscription but do not belong to any organization.
+        </div>
+        <div class="table-wrapper">
+        <table class="node-details-table">
+            <thead>
+                <tr>
+                    <th>Node</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for node in metrics.nodes %}
+                {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+                {% if not has_orgs %}
+                <tr>
+                    <td>{{ node.nodename }}</td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>

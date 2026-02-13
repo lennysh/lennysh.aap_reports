@@ -32,14 +32,27 @@ organizations:
 {% endfor %}
 {% if show_node_details | default(true) | bool %}
 
-nodes:
+nodes_with_organizations:
 {% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
     organizations:
 {% for org_id in node.organizations %}
       - {{ org_id }}
 {% endfor %}
+{% endif %}
+{% endfor %}
+
+orphaned_nodes:
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+  - nodename: "{{ node.nodename }}"
+    license: {{ node.license | lower }}
+    organizations: []
+{% endif %}
 {% endfor %}
 {% endif %}
 

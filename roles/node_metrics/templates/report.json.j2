@@ -25,13 +25,35 @@
 {% endfor %}
   ],
 {% if show_node_details | default(true) | bool %}
-  "nodes": [
+  "nodes_with_organizations": [
+{% set ns = namespace(first_with_orgs=true) %}
 {% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
+{% if not ns.first_with_orgs %},
+{% endif %}
     {
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
       "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    }{% if not loop.last %},
+    }
+{% set ns.first_with_orgs = false %}
+{% endif %}
+{% endfor %}
+  ],
+  "orphaned_nodes": [
+{% set ns = namespace(first_orphan=true) %}
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+{% if not ns.first_orphan %},
+{% endif %}
+    {
+      "nodename": "{{ node.nodename }}",
+      "license": {{ node.license | lower }},
+      "organizations": []
+    }
+{% set ns.first_orphan = false %}
 {% endif %}
 {% endfor %}
   ],

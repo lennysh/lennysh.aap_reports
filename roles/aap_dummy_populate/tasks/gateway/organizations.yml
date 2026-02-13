@@ -1,0 +1,15 @@
+---
+# AAP 2.5+ only: create organizations on the gateway first
+- name: Create gateway organizations (AAP 2.5+)
+  ansible.platform.organization:
+    name: "{{ item.name }}"
+    state: present
+    aap_hostname: "{{ aap_hostname | default(omit) }}"
+    aap_username: "{{ aap_username | default(omit) }}"
+    aap_password: "{{ aap_password | default(omit) }}"
+    aap_token: "{{ aap_token | default(omit) }}"
+    aap_validate_certs: "{{ aap_validate_certs }}"
+  loop: "{{ aap_dummy.organizations }}"
+  loop_control:
+    label: "{{ item.name }}"
+...

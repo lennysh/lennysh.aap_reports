@@ -1,0 +1,25 @@
+---
+# AAP connection: same URL (aap_hostname) for 2.4 and 2.5+; only API paths differ by version.
+# Set via play vars or extra vars; no defaults for credentials
+# aap_hostname: "https://aap.example.com"
+# aap_username: admin
+# aap_password: "{{ aap_password }}"
+# aap_token: "{{ aap_token }}"
+aap_validate_certs: true
+
+# Set to false for testing to see token/auth output in logs (default true for security)
+aap_dummy_populate_no_log: true
+
+# AAP version: "2.4" = controller API only; "2.5" = gateway orgs first then controller
+aap_version: "2.5"
+
+# aap_dummy_data parameters (same as aap_dummy_data module)
+aap_dummy_org_count: 3
+aap_dummy_hosts_count: 30
+aap_dummy_inventories_per_org: 1
+aap_dummy_hostname_casing: mixed
+aap_dummy_multi_org_percent: 0
+aap_dummy_allow_same_name_different_casing: false
+aap_dummy_even_host_distribution: false
+aap_dummy_disabled_host_percent: 0
+...

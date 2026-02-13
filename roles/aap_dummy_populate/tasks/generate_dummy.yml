@@ -1,0 +1,15 @@
+---
+# Generate dummy data (no API calls); used by both 2.4 and 2.5
+- name: Generate dummy organizations, inventories, and hosts data
+  lennysh.aap_reports.aap_dummy_data:
+    org_count: "{{ aap_dummy_org_count }}"
+    hosts_count: "{{ aap_dummy_hosts_count }}"
+    inventories_per_org: "{{ aap_dummy_inventories_per_org }}"
+    hostname_casing: "{{ aap_dummy_hostname_casing }}"
+    multi_org_percent: "{{ aap_dummy_multi_org_percent }}"
+    allow_same_name_different_casing: "{{ aap_dummy_allow_same_name_different_casing }}"
+    even_host_distribution: "{{ aap_dummy_even_host_distribution }}"
+    disabled_host_percent: "{{ aap_dummy_disabled_host_percent }}"
+  register: aap_dummy
+  delegate_to: localhost
+...

@@ -1,0 +1,24 @@
+---
+# AAP 2.4 only: create temporary token via controller API
+- name: Get AAP token (controller, AAP 2.4)
+  ansible.controller.token:
+    description: "Temporary token for aap_dummy_populate"
+    scope: "write"
+    state: present
+    controller_host: "{{ aap_hostname }}"
+    controller_username: "{{ aap_username }}"
+    controller_password: "{{ aap_password }}"
+    validate_certs: "{{ aap_validate_certs }}"
+  no_log: "{{ aap_dummy_populate_no_log | bool }}"
+  register: __token_result_controller
+
+- name: Set facts after controller token
+  ansible.builtin.set_fact:
+    aap_token: "{{ __token_result_controller.controller_token.token }}"
+    __aap_token_obj: "{{ __token_result_controller.controller_token }}"
+    __clear_token: true
+    __token_from_platform: false
+  when:
+    - __token_result_controller is defined
+    - __token_result_controller.controller_token is defined
+...

@@ -1,0 +1,11 @@
+---
+# AAP 2.5+ only: revoke temporary token
+- name: Clear AAP token (platform)
+  ansible.platform.token:
+    existing_token: "{{ __aap_token_obj }}"
+    state: absent
+    aap_hostname: "{{ aap_hostname }}"
+    aap_token: "{{ aap_token }}"
+    aap_validate_certs: "{{ aap_validate_certs }}"
+  no_log: "{{ aap_dummy_populate_no_log | bool }}"
+...

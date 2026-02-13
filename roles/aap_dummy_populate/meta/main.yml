@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Generate dummy AAP data then create organizations, inventories, and hosts via API (controller/gateway modules).
+  license: MIT
+  min_ansible_version: "2.16.0"
+  galaxy_tags:
+    - aap
+    - automation
+    - dummy
+    - controller
+    - gateway
+
+dependencies: []
+# Requires collections: ansible.controller, ansible.platform, lennysh.aap_reports.

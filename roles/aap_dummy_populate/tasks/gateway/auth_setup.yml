@@ -1,0 +1,25 @@
+---
+# AAP 2.5+ only: create temporary token via platform (gateway) API
+- name: Get AAP token (platform, AAP 2.5+)
+  ansible.platform.token:
+    description: "Temporary token for aap_dummy_populate"
+    scope: "write"
+    state: present
+    aap_hostname: "{{ aap_hostname }}"
+    aap_username: "{{ aap_username }}"
+    aap_password: "{{ aap_password }}"
+    aap_validate_certs: "{{ aap_validate_certs }}"
+  no_log: "{{ aap_dummy_populate_no_log | bool }}"
+  register: __token_result
+
+- name: Set facts after platform token
+  ansible.builtin.set_fact:
+    aap_token: "{{ __token_result.ansible_facts.aap_token.token }}"
+    __aap_token_obj: "{{ __token_result.ansible_facts.aap_token }}"
+    __clear_token: true
+    __token_from_platform: true
+  when:
+    - __token_result is defined
+    - __token_result.ansible_facts is defined
+    - __token_result.ansible_facts.aap_token is defined
+...

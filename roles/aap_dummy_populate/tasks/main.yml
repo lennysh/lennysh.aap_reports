@@ -1,0 +1,55 @@
+---
+# Same aap_hostname URL for all versions; only API endpoints differ (2.5+ uses gateway + controller paths).
+# Get temporary token when username/password provided and no token set.
+# AAP 2.5+ requires gateway auth (platform token); 2.4 uses controller token.
+- name: Get token (AAP 2.5+ gateway)
+  ansible.builtin.include_tasks: gateway/auth_setup.yml
+  when:
+    - aap_token is not defined or (aap_token | default('') | string | length == 0)
+    - aap_username is defined and (aap_username | default('') | string | length > 0)
+    - aap_password is defined and (aap_password | default('') | string | length > 0)
+    - aap_version is version('2.5', '>=')
+
+- name: Get token (AAP 2.4 controller)
+  ansible.builtin.include_tasks: controller/auth_setup.yml
+  when:
+    - aap_token is not defined or (aap_token | default('') | string | length == 0)
+    - aap_username is defined and (aap_username | default('') | string | length > 0)
+    - aap_password is defined and (aap_password | default('') | string | length > 0)
+    - aap_version is version('2.5', '<')
+
+# Populate AAP: generate dummy data, create gateway orgs (2.5+), then controller orgs/inventories/hosts
+- name: Populate AAP with dummy data
+  block:
+    - name: Generate dummy data
+      ansible.builtin.include_tasks: generate_dummy.yml
+
+    - name: Create gateway organizations (AAP 2.5+ only)
+      ansible.builtin.include_tasks: gateway/organizations.yml
+      when: aap_version is version('2.5', '>=')
+
+    - name: Create controller organizations
+      ansible.builtin.include_tasks: controller/organizations.yml
+      when: aap_version is version('2.5', '<')
+
+    - name: Create controller inventories
+      ansible.builtin.include_tasks: controller/inventories.yml
+
+    - name: Create controller hosts
+      ansible.builtin.include_tasks: controller/hosts.yml
+
+  always:
+    - name: Clear token (AAP 2.5+ gateway)
+      ansible.builtin.include_tasks: gateway/auth_clear.yml
+      when:
+        - __clear_token | default(false) | bool
+        - __aap_token_obj is defined
+        - __token_from_platform | default(false) | bool
+
+    - name: Clear token (AAP 2.4 controller)
+      ansible.builtin.include_tasks: controller/auth_clear.yml
+      when:
+        - __clear_token | default(false) | bool
+        - __aap_token_obj is defined
+        - not (__token_from_platform | default(true) | bool)
+...

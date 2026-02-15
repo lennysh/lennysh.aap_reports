@@ -38,11 +38,11 @@ Node,Subscription,Organizations
 
 Orphaned Nodes (nodes consuming a subscription but not in any organization)
 
-Node
+Node,First Automation,Last Automation,Last Deleted,Automated Counter,Deleted Counter
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-{{ node.nodename }}
+{{ node.nodename }},{{ node.first_automation | default('', true) | string }},{{ node.last_automation | default('', true) | string }},{{ node.last_deleted | default('', true) | string }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
 {% endif %}
 {% endfor %}
 {% endif %}

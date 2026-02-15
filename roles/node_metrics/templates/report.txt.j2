@@ -96,12 +96,19 @@ Orphaned Nodes
 
 Nodes that are currently consuming a subscription but do not belong to any organization.
 
-{{ pad("Node Name", node_name_width) }}
-{{ "-" * node_name_width }}
+{% set ts_width = 28 %}
+{% set counter_width = 8 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("First Automation", ts_width) }}| {{ pad("Last Automation", ts_width) }}| {{ pad("Last Deleted", ts_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}
+{{ "-" * node_name_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-{{ pad(node.nodename, node_name_width) }}
+{% set fa = node.first_automation | default('', true) | string %}
+{% set la = node.last_automation | default('', true) | string %}
+{% set ld = node.last_deleted | default('', true) | string %}
+{% set ac = node.automated_counter | default('', true) | string %}
+{% set dc = node.deleted_counter | default('', true) | string %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}
 {% endif %}
 {% endfor %}
 {% endif %}

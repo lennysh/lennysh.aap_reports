@@ -181,6 +181,26 @@ metrics:
                     description: List of organization IDs this node belongs to
                     type: list
                     elements: int
+                first_automation:
+                    description: From host_metrics; first automation timestamp (ISO format)
+                    type: str
+                    returned: when present in host_metrics
+                last_automation:
+                    description: From host_metrics; last automation timestamp (ISO format)
+                    type: str
+                    returned: when present in host_metrics
+                last_deleted:
+                    description: From host_metrics; last deleted timestamp (ISO format) or null
+                    type: str
+                    returned: when present in host_metrics
+                automated_counter:
+                    description: From host_metrics; number of automations
+                    type: int
+                    returned: when present in host_metrics
+                deleted_counter:
+                    description: From host_metrics; number of deletions
+                    type: int
+                    returned: when present in host_metrics
         organization_names:
             description: Mapping of organization ID to name
             type: dict
@@ -380,6 +400,21 @@ def run_module():
                     node_to_orgs_set[nodename_lower] = set()
                 node_to_orgs_set[nodename_lower].add(org_id)
 
+        # Build map of host_metrics fields per node (all host_metrics entries with hostname)
+        # Used to attach first_automation, last_automation, last_deleted, automated_counter, deleted_counter to nodes
+        host_metrics_by_node = {}
+        for metric in host_metrics:
+            nodename = metric.get('hostname')
+            if nodename:
+                nodename_lower = nodename.lower()
+                host_metrics_by_node[nodename_lower] = {
+                    'first_automation': metric.get('first_automation'),
+                    'last_automation': metric.get('last_automation'),
+                    'last_deleted': metric.get('last_deleted'),
+                    'automated_counter': metric.get('automated_counter'),
+                    'deleted_counter': metric.get('deleted_counter'),
+                }
+
         # Map subscription-consuming nodes (convert to lowercase)
         # Only nodes with deleted=False are currently consuming subscriptions
         # deleted=True means the node is NOT consuming a subscription/seat
@@ -540,11 +575,18 @@ def run_module():
             else:
                 # Node not in any inventory (orphaned but still consuming subscription)
                 org_ids = []
-            nodes_list.append({
+            hm = host_metrics_by_node.get(nodename_lower, {})
+            node_entry = {
                 'nodename': nodename_lower,
                 'license': nodename_lower in license_nodes_set,
-                'organizations': sorted(org_ids)
-            })
+                'organizations': sorted(org_ids),
+                'first_automation': hm.get('first_automation'),
+                'last_automation': hm.get('last_automation'),
+                'last_deleted': hm.get('last_deleted'),
+                'automated_counter': hm.get('automated_counter'),
+                'deleted_counter': hm.get('deleted_counter'),
+            }
+            nodes_list.append(node_entry)
 
         # Build metrics data structure
         metrics = {

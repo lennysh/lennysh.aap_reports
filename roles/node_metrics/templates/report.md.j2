@@ -44,12 +44,12 @@ Nodes that have at least one organization, with subscription consumption status 
 
 Nodes that are currently consuming a subscription but do not belong to any organization.
 
-| Node |
-|------|
+| Node | First Automation | Last Automation | Last Deleted | Automated Counter | Deleted Counter |
+|------|------------------|-----------------|---------------|-------------------|-----------------|
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-| {{ node.nodename }} |
+| {{ node.nodename }} | {{ node.first_automation | default('', true) }} | {{ node.last_automation | default('', true) }} | {{ node.last_deleted | default('', true) }} | {{ node.automated_counter | default('', true) }} | {{ node.deleted_counter | default('', true) }} |
 {% endif %}
 {% endfor %}
 {% endif %}

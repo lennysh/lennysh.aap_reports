@@ -260,6 +260,11 @@
             <thead>
                 <tr>
                     <th>Node</th>
+                    <th>First Automation</th>
+                    <th>Last Automation</th>
+                    <th>Last Deleted</th>
+                    <th>Automated Counter</th>
+                    <th>Deleted Counter</th>
                 </tr>
             </thead>
             <tbody>
@@ -268,6 +273,11 @@
                 {% if not has_orgs %}
                 <tr>
                     <td>{{ node.nodename }}</td>
+                    <td>{{ node.first_automation | default('', true) }}</td>
+                    <td>{{ node.last_automation | default('', true) }}</td>
+                    <td>{{ node.last_deleted | default('', true) }}</td>
+                    <td>{{ node.automated_counter | default('', true) }}</td>
+                    <td>{{ node.deleted_counter | default('', true) }}</td>
                 </tr>
                 {% endif %}
                 {% endfor %}

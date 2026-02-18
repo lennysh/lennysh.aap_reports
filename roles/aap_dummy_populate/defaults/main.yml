@@ -1,7 +1,7 @@
 ---
-# AAP connection: same URL (aap_hostname) for 2.4 and 2.5+; only API paths differ by version.
+# AAP connection: same URL (aap_url) for 2.4 and 2.5+; only API paths differ by version.
 # Set via play vars or extra vars; no defaults for credentials
-# aap_hostname: "https://aap.example.com"
+# aap_url: "https://aap.example.com"
 # aap_username: admin
 # aap_password: "{{ aap_password }}"
 # aap_token: "{{ aap_token }}"

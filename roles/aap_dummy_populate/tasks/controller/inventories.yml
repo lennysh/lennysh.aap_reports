@@ -5,7 +5,7 @@
     name: "{{ item.name }}"
     organization: "{{ (aap_dummy.organizations | selectattr('id', 'equalto', item.organization_id) | list)[0].name }}"
     state: present
-    controller_host: "{{ aap_hostname | default(omit) }}"
+    controller_host: "{{ aap_url | default(omit) }}"
     controller_username: "{{ aap_username | default(omit) }}"
     controller_password: "{{ aap_password | default(omit) }}"
     controller_oauthtoken: "{{ aap_token | default(omit) }}"

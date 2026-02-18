@@ -4,7 +4,7 @@
   ansible.platform.organization:
     name: "{{ item.name }}"
     state: present
-    aap_hostname: "{{ aap_hostname | default(omit) }}"
+    aap_url: "{{ aap_url | default(omit) }}"
     aap_username: "{{ aap_username | default(omit) }}"
     aap_password: "{{ aap_password | default(omit) }}"
     aap_token: "{{ aap_token | default(omit) }}"

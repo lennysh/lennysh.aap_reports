@@ -27,7 +27,7 @@ Generates dummy organization, inventory, and host data using `lennysh.aap_report
 
 Connection (set in play or extra vars):
 
-- `aap_hostname` — AAP base URL (e.g. `https://aap.example.com`). **Same URL for 2.4 and 2.5+**; only the API endpoints (paths) differ by version.
+- `aap_url` — AAP base URL (e.g. `https://aap.example.com`). **Same URL for 2.4 and 2.5+**; only the API endpoints (paths) differ by version.
 - `aap_username` / `aap_password` — Basic auth (optional if token set).
 - `aap_token` — API token (optional if username/password set).
 - `aap_validate_certs` — Validate SSL (default: `true`).
@@ -45,7 +45,7 @@ Dummy data shape (same as `aap_dummy_data`):
 - hosts: localhost
   gather_facts: false
   vars:
-    aap_hostname: "https://aap.example.com"
+    aap_url: "https://aap.example.com"
     aap_username: admin
     aap_password: "{{ aap_password }}"
     aap_version: "2.5"

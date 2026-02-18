@@ -5,7 +5,7 @@
     description: "Temporary token for aap_dummy_populate"
     scope: "write"
     state: present
-    aap_hostname: "{{ aap_hostname }}"
+    aap_url: "{{ aap_url }}"
     aap_username: "{{ aap_username }}"
     aap_password: "{{ aap_password }}"
     aap_validate_certs: "{{ aap_validate_certs }}"

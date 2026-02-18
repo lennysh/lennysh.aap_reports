@@ -1,5 +1,5 @@
 ---
-# Same aap_hostname URL for all versions; only API endpoints differ (2.5+ uses gateway + controller paths).
+# Same aap_url URL for all versions; only API endpoints differ (2.5+ uses gateway + controller paths).
 # Get temporary token when username/password provided and no token set.
 # AAP 2.5+ requires gateway auth (platform token); 2.4 uses controller token.
 - name: Get token (AAP 2.5+ gateway)

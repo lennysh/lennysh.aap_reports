@@ -3,7 +3,7 @@
 # The role runs aap_dummy_data (no API) then creates orgs, inventories, and hosts
 # via ansible.controller (and ansible.platform for 2.5+ gateway orgs).
 #
-# Set aap_hostname and either aap_token or (aap_username + aap_password).
+# Set aap_url and either aap_token or (aap_username + aap_password).
 # Optional: aap_version ("2.4" or "2.5"), aap_validate_certs, and any aap_dummy_* vars.
 - name: Populate AAP with dummy data via API tasks
   hosts: localhost

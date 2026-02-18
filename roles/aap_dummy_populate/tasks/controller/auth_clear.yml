@@ -4,7 +4,7 @@
   ansible.controller.token:
     existing_token: "{{ __aap_token_obj }}"
     state: absent
-    controller_host: "{{ aap_hostname }}"
+    controller_host: "{{ aap_url }}"
     controller_oauthtoken: "{{ aap_token }}"
     validate_certs: "{{ aap_validate_certs }}"
   no_log: "{{ aap_dummy_populate_no_log | bool }}"

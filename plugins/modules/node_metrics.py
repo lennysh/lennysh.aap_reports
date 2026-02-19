@@ -106,6 +106,25 @@ metrics:
             description: AAP Controller URL from which data was collected
             type: str
             sample: "https://aap.example.com"
+        subscription_details:
+            description: Subscription and license details from the controller /config endpoint (license_info, version)
+            type: dict
+            returned: when /config is available
+            contains:
+                status: Compliance status (e.g. In compliance, Out of compliance)
+                status_description: Optional description when out of compliance
+                hosts_remaining: Remaining managed hosts from license
+                subscription_type: License type (e.g. enterprise)
+                expires_on: License expiry (formatted or placeholder)
+                expires_on_utc: License expiry in UTC (or placeholder)
+                automation_controller_version: Controller version
+                hosts_automated: Consumed hosts text (with optional "since" placeholder)
+                hosts_deleted: Placeholder if not in API
+                subscription_sku: Placeholder if not in API
+                hosts_imported: Active hosts count from metrics
+                active_hosts_previously_deleted: Placeholder if not in API
+                trial: Placeholder if not in API
+                days_remaining: Days until license expiry when derivable
         organizations:
             description: List of organization metrics
             type: list
@@ -261,6 +280,145 @@ def detect_api_path(module, url, auth=None, headers=None, verify=True):
     return "/api/controller/v2"
 
 
+def fetch_controller_config(module, url, api_base_path, auth=None, headers=None, verify=True):
+    """Fetch the controller /config endpoint (license_info, version, etc.).
+
+    Returns parsed dict or None if the endpoint is unavailable or fails.
+    """
+    config_url = f"{url}{api_base_path}/config"
+    try:
+        if auth:
+            response = requests.get(config_url, auth=auth, verify=verify, timeout=30)
+        else:
+            response = requests.get(config_url, headers=headers, verify=verify, timeout=30)
+        if response.status_code != 200:
+            return None
+        return response.json()
+    except Exception:
+        return None
+
+
+def build_subscription_details(config_json):
+    """Build a subscription_details dict from /config JSON (license_info + version) for report templates."""
+    if not config_json:
+        return None
+    try:
+        license_info = config_json.get("license_info") or {}
+        version = config_json.get("version") or "(placeholder)"
+
+        compliant = license_info.get("compliant", True)
+        status = "Out of compliance" if not compliant else "In compliance"
+        status_description = (
+            "You have automated against more hosts than your subscription allows."
+            if not compliant
+            else ""
+        )
+
+        free_instances = license_info.get("free_instances")
+        if free_instances is not None:
+            free_instances = int(free_instances)
+
+        # Expiry: license_date is Unix timestamp for license expiry
+        license_date_raw = license_info.get("license_date")
+        expires_on = ""
+        expires_on_utc = ""
+        if license_date_raw is not None and str(license_date_raw).strip():
+            try:
+                ts = int(license_date_raw)
+                if ts > 1000000000:
+                    expires_on = datetime.utcfromtimestamp(ts).strftime("%m/%d/%Y, %I:%M:%S %p")
+                    expires_on_utc = datetime.utcfromtimestamp(ts).strftime("%m/%d/%Y, %I:%M:%S %p UTC")
+                else:
+                    expires_on = str(license_date_raw)
+                    expires_on_utc = "(placeholder)"
+            except (ValueError, TypeError, OSError):
+                expires_on = str(license_date_raw)
+                expires_on_utc = "(placeholder)"
+        if not expires_on:
+            expires_on = "(placeholder)"
+        if not expires_on_utc:
+            expires_on_utc = "(placeholder)"
+
+        # time_remaining: seconds until expiry -> days_remaining
+        time_remaining = license_info.get("time_remaining")
+        days_remaining = None
+        if time_remaining is not None:
+            try:
+                seconds = int(time_remaining)
+                days_remaining = max(0, seconds // 86400)
+            except (ValueError, TypeError):
+                pass
+
+        # Hosts automated: automated_instances and automated_since (Unix timestamp)
+        automated_instances = license_info.get("automated_instances")
+        automated_since = license_info.get("automated_since")
+        if automated_instances is not None:
+            automated_instances = int(automated_instances)
+        if automated_since is not None:
+            try:
+                ts = int(automated_since)
+                if ts > 1000000000:
+                    since_str = datetime.utcfromtimestamp(ts).strftime("%m/%d/%Y, %I:%M:%S %p")
+                    hosts_automated = f"{automated_instances} since {since_str}"
+                else:
+                    hosts_automated = f"{automated_instances} since (placeholder)"
+            except (ValueError, TypeError, OSError):
+                hosts_automated = f"{automated_instances} since (placeholder)" if automated_instances is not None else "(placeholder)"
+        else:
+            hosts_automated = f"{automated_instances} since (placeholder)" if automated_instances is not None else "(placeholder)"
+
+        # Subscription name/SKU: product_name or subscription_name
+        subscription_sku = (
+            license_info.get("product_name")
+            or license_info.get("subscription_name")
+            or license_info.get("sku")
+            or "(placeholder)"
+        )
+
+        deleted_instances = license_info.get("deleted_instances")
+        if deleted_instances is not None:
+            deleted_instances = int(deleted_instances)
+        else:
+            deleted_instances = "(placeholder)"
+
+        reactivated = license_info.get("reactivated_instances")
+        if reactivated is not None:
+            active_hosts_previously_deleted = int(reactivated)
+        else:
+            active_hosts_previously_deleted = "(placeholder)"
+
+        current_instances = license_info.get("current_instances")
+        if current_instances is not None:
+            current_instances = int(current_instances)
+        else:
+            current_instances = "(placeholder)"
+
+        trial = license_info.get("trial")
+        if trial is None:
+            trial = "(placeholder)"
+        else:
+            trial = "True" if trial else "False"
+
+        return {
+            "status": status,
+            "status_description": status_description,
+            "hosts_remaining": free_instances if free_instances is not None else "(placeholder)",
+            "subscription_type": license_info.get("license_type") or "(placeholder)",
+            "expires_on": expires_on,
+            "expires_on_utc": expires_on_utc,
+            "automation_controller_version": version,
+            "hosts_automated": hosts_automated,
+            "hosts_deleted": deleted_instances,
+            "subscription_sku": subscription_sku,
+            "hosts_imported": current_instances,
+            "active_hosts_previously_deleted": active_hosts_previously_deleted,
+            "trial": trial,
+            "days_remaining": days_remaining,
+        }
+    except Exception:
+        return None
+
+
 def get_all_pages(module, url, endpoint, api_base_path, auth=None, headers=None, verify=True):
     """Fetch all pages from a paginated API endpoint.
 
@@ -356,6 +514,12 @@ def run_module():
         else:
             # This shouldn't happen due to required_one_of validation, but just in case
             module.fail_json(msg="Either token or username/password must be provided")
+
+        # Fetch controller /config (license_info, version) for subscription details
+        controller_config = fetch_controller_config(
+            module, url, api_base_path, auth=auth, headers=headers, verify=validate_certs
+        )
+        subscription_details = build_subscription_details(controller_config)
 
         # Fetch organizations
         organizations = get_all_pages(module, url, "/organizations/", api_base_path, auth=auth, headers=headers, verify=validate_certs)
@@ -592,6 +756,7 @@ def run_module():
         metrics = {
             'generated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
             'aap_url': url,
+            'subscription_details': subscription_details,
             'organizations': org_list,
             'totals': totals,
             'nodes': nodes_list,

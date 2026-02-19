@@ -166,6 +166,24 @@
         .node-details-table td:nth-child(3) {
             text-align: left;
         }
+        .subscription-details-table th {
+            text-align: left;
+            font-weight: 600;
+            width: 1%;
+            white-space: nowrap;
+            padding-right: 12px;
+        }
+        .subscription-details-table td {
+            text-align: left;
+        }
+        .status-out-of-compliance {
+            color: #c9190b;
+            font-weight: 600;
+        }
+        .description-inline {
+            color: rgba(0, 0, 0, 0.7);
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +194,51 @@
             <strong>AAP Instance:</strong> {{ metrics.aap_url }}<br>
             <strong>Generated:</strong> {{ metrics.generated_at }}
         </div>
-
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+        <h2>Subscription Details</h2>
+        <div class="table-wrapper">
+        <table class="subscription-details-table">
+            <tbody>
+                <tr>
+                    <th scope="row">Status</th>
+                    <td colspan="5">{% if metrics.subscription_details.status == "Out of compliance" %}<span class="status-out-of-compliance">{{ metrics.subscription_details.status }}</span>{% else %}{{ metrics.subscription_details.status }}{% endif %}{% if metrics.subscription_details.status_description %}<br><span class="description-inline">{{ metrics.subscription_details.status_description }}</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Hosts remaining</th>
+                    <td>{{ metrics.subscription_details.hosts_remaining }}</td>
+                    <th scope="row">Hosts automated</th>
+                    <td>{{ metrics.subscription_details.hosts_automated }}</td>
+                    <th scope="row">Hosts imported</th>
+                    <td>{{ metrics.subscription_details.hosts_imported }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Subscription type</th>
+                    <td>{{ metrics.subscription_details.subscription_type }}</td>
+                    <th scope="row">Hosts deleted</th>
+                    <td>{{ metrics.subscription_details.hosts_deleted }}</td>
+                    <th scope="row">Active hosts previously deleted</th>
+                    <td>{{ metrics.subscription_details.active_hosts_previously_deleted }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Expires on</th>
+                    <td>{{ metrics.subscription_details.expires_on }}</td>
+                    <th scope="row">Subscription (SKU)</th>
+                    <td>{{ metrics.subscription_details.subscription_sku }}</td>
+                    <th scope="row">Trial</th>
+                    <td>{{ metrics.subscription_details.trial }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Automation controller version</th>
+                    <td>{{ metrics.subscription_details.automation_controller_version }}</td>
+                    <th scope="row">Expires on UTC</th>
+                    <td>{{ metrics.subscription_details.expires_on_utc }}</td>
+                    <th scope="row">Days remaining</th>
+                    <td>{{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+{% endif %}
         <h2>Organization Node and Subscription Metrics</h2>
         <div class="table-wrapper">
         <table>

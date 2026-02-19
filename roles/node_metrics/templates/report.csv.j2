@@ -2,6 +2,24 @@ Ansible Automation Platform Node Metrics Report
 AAP Instance: {{ metrics.aap_url }}
 Generated: {{ metrics.generated_at }}
 
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+Subscription Details
+Field,Value
+Status,{{ metrics.subscription_details.status }}{% if metrics.subscription_details.status_description %} — {{ metrics.subscription_details.status_description }}{% endif %}
+Hosts remaining,{{ metrics.subscription_details.hosts_remaining }}
+Subscription type,{{ metrics.subscription_details.subscription_type }}
+Expires on,{{ metrics.subscription_details.expires_on }}
+Automation controller version,{{ metrics.subscription_details.automation_controller_version }}
+Hosts automated,{{ metrics.subscription_details.hosts_automated }}
+Hosts deleted,{{ metrics.subscription_details.hosts_deleted }}
+Subscription (SKU),{{ metrics.subscription_details.subscription_sku }}
+Expires on UTC,{{ metrics.subscription_details.expires_on_utc }}
+Hosts imported,{{ metrics.subscription_details.hosts_imported }}
+Active hosts previously deleted,{{ metrics.subscription_details.active_hosts_previously_deleted }}
+Trial,{{ metrics.subscription_details.trial }}
+Days remaining,{{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}
+
+{% endif %}
 Organization Node and Subscription Metrics
 
 Organization,Max Nodes,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,Unique Subscriptions,Unique Subscriptions %,Shared Subscriptions,Shared Subscriptions %

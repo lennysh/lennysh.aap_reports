@@ -3,7 +3,24 @@
     <title>Ansible Automation Platform Node Metrics Report</title>
     <aap_url>{{ metrics.aap_url }}</aap_url>
     <generated_at>{{ metrics.generated_at }}</generated_at>
-    
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+    <subscription_details>
+        <status>{{ metrics.subscription_details.status }}</status>
+        <status_description>{{ metrics.subscription_details.status_description }}</status_description>
+        <hosts_remaining>{{ metrics.subscription_details.hosts_remaining }}</hosts_remaining>
+        <subscription_type>{{ metrics.subscription_details.subscription_type }}</subscription_type>
+        <expires_on>{{ metrics.subscription_details.expires_on }}</expires_on>
+        <automation_controller_version>{{ metrics.subscription_details.automation_controller_version }}</automation_controller_version>
+        <hosts_automated>{{ metrics.subscription_details.hosts_automated }}</hosts_automated>
+        <hosts_deleted>{{ metrics.subscription_details.hosts_deleted }}</hosts_deleted>
+        <subscription_sku>{{ metrics.subscription_details.subscription_sku }}</subscription_sku>
+        <expires_on_utc>{{ metrics.subscription_details.expires_on_utc }}</expires_on_utc>
+        <hosts_imported>{{ metrics.subscription_details.hosts_imported }}</hosts_imported>
+        <active_hosts_previously_deleted>{{ metrics.subscription_details.active_hosts_previously_deleted }}</active_hosts_previously_deleted>
+        <trial>{{ metrics.subscription_details.trial }}</trial>
+        <days_remaining>{% if metrics.subscription_details.days_remaining is not none %}{{ metrics.subscription_details.days_remaining }}{% else %}(placeholder){% endif %}</days_remaining>
+    </subscription_details>
+{% endif %}
     <organizations>
 {% for org in metrics.organizations %}
         <organization>

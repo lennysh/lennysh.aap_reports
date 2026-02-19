@@ -13,4 +13,8 @@
   loop: "{{ aap_dummy.inventories }}"
   loop_control:
     label: "{{ item.name }}"
+  retries: "{{ aap_dummy_populate_retries }}"
+  delay: "{{ aap_dummy_populate_retry_delay }}"
+  register: inv_result
+  until: inv_result is succeeded
 ...

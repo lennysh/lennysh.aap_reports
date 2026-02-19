@@ -22,4 +22,8 @@ aap_dummy_multi_org_percent: 0
 aap_dummy_allow_same_name_different_casing: false
 aap_dummy_even_host_distribution: false
 aap_dummy_disabled_host_percent: 0
+
+# Retry API create tasks (organizations, inventories, hosts)
+aap_dummy_populate_retries: 3
+aap_dummy_populate_retry_delay: 5
 ...

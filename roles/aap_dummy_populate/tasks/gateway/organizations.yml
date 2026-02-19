@@ -12,4 +12,8 @@
   loop: "{{ aap_dummy.organizations }}"
   loop_control:
     label: "{{ item.name }}"
+  retries: "{{ aap_dummy_populate_retries }}"
+  delay: "{{ aap_dummy_populate_retry_delay }}"
+  register: gateway_org_result
+  until: gateway_org_result is succeeded
 ...

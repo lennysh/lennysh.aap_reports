@@ -2,13 +2,37 @@ Ansible Automation Platform Node Metrics Report
 AAP Instance: {{ metrics.aap_url }}
 Generated: {{ metrics.generated_at }}
 
+{% macro pad(text, width) %}{{ text }}{{ " " * (width - text | length) }}{% endmacro %}
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+================================================================================
+Subscription Details
+================================================================================
+
+{% set label_width = 35 %}
+{% set value_width = 50 %}
+{{ pad("Field", label_width) }}| {{ pad("Value", value_width) }}
+{{ "-" * label_width }}+ {{ "-" * value_width }}
+{{ pad("Status", label_width) }}| {{ metrics.subscription_details.status }}{% if metrics.subscription_details.status_description %} — {{ metrics.subscription_details.status_description }}{% endif %}
+{{ pad("Hosts remaining", label_width) }}| {{ metrics.subscription_details.hosts_remaining }}
+{{ pad("Subscription type", label_width) }}| {{ metrics.subscription_details.subscription_type }}
+{{ pad("Expires on", label_width) }}| {{ metrics.subscription_details.expires_on }}
+{{ pad("Automation controller version", label_width) }}| {{ metrics.subscription_details.automation_controller_version }}
+{{ pad("Hosts automated", label_width) }}| {{ metrics.subscription_details.hosts_automated }}
+{{ pad("Hosts deleted", label_width) }}| {{ metrics.subscription_details.hosts_deleted }}
+{{ pad("Subscription (SKU)", label_width) }}| {{ metrics.subscription_details.subscription_sku }}
+{{ pad("Expires on UTC", label_width) }}| {{ metrics.subscription_details.expires_on_utc }}
+{{ pad("Hosts imported", label_width) }}| {{ metrics.subscription_details.hosts_imported }}
+{{ pad("Active hosts previously deleted", label_width) }}| {{ metrics.subscription_details.active_hosts_previously_deleted }}
+{{ pad("Trial", label_width) }}| {{ metrics.subscription_details.trial }}
+{{ pad("Days remaining", label_width) }}| {{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}
+
+{% endif %}
 ================================================================================
 Organization Node and Subscription Metrics
 ================================================================================
 
 {% set org_name_width = 40 %}
 {% set col_width = 18 %}
-{% macro pad(text, width) %}{{ text }}{{ " " * (width - text | length) }}{% endmacro %}
 {{ pad("Organization Name", org_name_width) }}| {{ pad("Max Nodes", col_width) }}| {{ pad("Unique Nodes", col_width) }}| {{ pad("Shared Nodes", col_width) }}| {{ pad("Unique Subs", col_width) }}| {{ pad("Shared Subs", col_width) }}
 {{ "-" * org_name_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}
 {% for org in metrics.organizations %}

@@ -4,6 +4,24 @@
     "aap_url": "{{ metrics.aap_url }}",
     "generated_at": "{{ metrics.generated_at }}"
   },
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+  "subscription_details": {
+    "status": "{{ metrics.subscription_details.status }}",
+    "status_description": "{{ metrics.subscription_details.status_description }}",
+    "hosts_remaining": {% if metrics.subscription_details.hosts_remaining is string %}"{{ metrics.subscription_details.hosts_remaining }}"{% else %}{{ metrics.subscription_details.hosts_remaining }}{% endif %},
+    "subscription_type": "{{ metrics.subscription_details.subscription_type }}",
+    "expires_on": "{{ metrics.subscription_details.expires_on }}",
+    "automation_controller_version": "{{ metrics.subscription_details.automation_controller_version }}",
+    "hosts_automated": "{{ metrics.subscription_details.hosts_automated }}",
+    "hosts_deleted": {% if metrics.subscription_details.hosts_deleted is string %}"{{ metrics.subscription_details.hosts_deleted }}"{% else %}{{ metrics.subscription_details.hosts_deleted }}{% endif %},
+    "subscription_sku": "{{ metrics.subscription_details.subscription_sku }}",
+    "expires_on_utc": "{{ metrics.subscription_details.expires_on_utc }}",
+    "hosts_imported": {% if metrics.subscription_details.hosts_imported is string %}"{{ metrics.subscription_details.hosts_imported }}"{% else %}{{ metrics.subscription_details.hosts_imported }}{% endif %},
+    "active_hosts_previously_deleted": {% if metrics.subscription_details.active_hosts_previously_deleted is string %}"{{ metrics.subscription_details.active_hosts_previously_deleted }}"{% else %}{{ metrics.subscription_details.active_hosts_previously_deleted }}{% endif %},
+    "trial": "{{ metrics.subscription_details.trial }}",
+    "days_remaining": {% if metrics.subscription_details.days_remaining is not none %}{{ metrics.subscription_details.days_remaining }}{% else %}null{% endif %}
+  },
+{% endif %}
   "organizations": [
 {% for org in metrics.organizations %}
     {

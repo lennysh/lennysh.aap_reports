@@ -49,3 +49,4 @@ test-workflow.txt
 ignore_*
 ansible-navigator.*
 .devcontainer/
+redact_reports.sh

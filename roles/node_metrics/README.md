@@ -4,7 +4,7 @@ This role generates node metrics reports from Ansible Automation Platform (AAP) 
 
 ## Description
 
-The `node_metrics` role connects to the AAP Controller API, collects organization-level node and subscription metrics, and generates reports using pre-built Jinja2 templates. It supports generating reports in multiple formats simultaneously.
+The `node_metrics` role connects to the AAP Controller API, collects organization-level node and subscription metrics, fetches controller subscription/license details from the `/config` endpoint when available, and generates reports using pre-built Jinja2 templates. It supports generating reports in multiple formats simultaneously.
 
 ## Requirements
 
@@ -179,6 +179,25 @@ Example reports in all supported formats are available in the [`report_examples/
 ## Report Structure
 
 All formats contain the same data, structured as follows:
+
+### Subscription Details (when available)
+
+When the controller `/config` endpoint is available, every report includes a **Subscription Details** section at the top with license and system information, including:
+
+- **Status** – Compliance status (e.g. In compliance, Out of compliance) and optional description
+- **Hosts remaining** – Remaining managed hosts from the license
+- **Subscription type** – License type (e.g. enterprise)
+- **Expires on** / **Expires on UTC** – License expiry (formatted)
+- **Automation controller version** – Controller version from config
+- **Hosts automated** – Consumed license seats and “since” date
+- **Hosts deleted** – Deleted instances count
+- **Subscription (SKU)** – Product/subscription name (e.g. Employee SKU)
+- **Hosts imported** – Current/active instances
+- **Active hosts previously deleted** – Reactivated instances
+- **Trial** – Trial license flag
+- **Days remaining** – Days until license expiry (when derivable)
+
+If `/config` is unavailable or fails, this section is omitted and the rest of the report is unchanged.
 
 ### Organization Metrics
 - **Max Nodes**: Maximum number of hosts allowed for the organization (0 = Unlimited, shown as "Unlimited" in reports)

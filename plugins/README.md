@@ -12,6 +12,7 @@ The `node_metrics` module connects to the Ansible Automation Platform (AAP) Cont
 
 **Description:**
 Collects node metrics data from AAP Controller including:
+- **Controller subscription/license details** (from the `/config` endpoint when available): status, hosts remaining, subscription type, expiry, automation controller version, hosts automated (with “since” date), hosts deleted, subscription SKU, hosts imported, active hosts previously deleted, trial, days remaining
 - Organization-level node counts (total, unique, shared)
 - Maximum hosts limit per organization (max_hosts field from API, 0 = Unlimited)
 - Subscription consumption metrics (unique, shared)
@@ -38,6 +39,21 @@ organizations_count: 3
 nodes_count: 10
 metrics:
   generated_at: "2026-01-20 15:36:54 UTC"
+  aap_url: "https://aap.example.com"
+  # Present when controller /config is available:
+  subscription_details:
+    status: "Out of compliance"
+    status_description: "You have automated against more hosts than your subscription allows."
+    hosts_remaining: 0
+    subscription_type: "enterprise"
+    expires_on: "01/01/2027, 04:59:59 AM"
+    automation_controller_version: "4.5.30"
+    hosts_automated: "800 since 10/14/2025, 05:16:13 PM"
+    hosts_deleted: 0
+    subscription_sku: "Employee SKU"
+    hosts_imported: 999
+    trial: "False"
+    days_remaining: 315
   organizations:
     - name: "Default"
       max_hosts: 20
@@ -89,6 +105,7 @@ metrics:
 ```
 
 **Notes:**
+- The module automatically detects the correct API path (AAP 2.5+ `/api/controller/v2/` vs AAP 2.4 `/api/v2/`) and fetches subscription/license details from the controller `/config` endpoint when available; `metrics.subscription_details` is omitted if `/config` is unavailable
 - The module automatically handles pagination for all API endpoints
 - If username/password is used, a temporary token is created and automatically deleted after use
 - All API calls include proper error handling and informative error messages

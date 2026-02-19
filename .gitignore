@@ -48,3 +48,4 @@ test-workflow.txt
 # Ignore directories
 ignore_*
 ansible-navigator.*
+.devcontainer/

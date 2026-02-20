@@ -5,19 +5,20 @@ Generated: {{ metrics.generated_at }}
 {% if metrics.subscription_details is defined and metrics.subscription_details %}
 Subscription Details
 Field,Value
-Status,{{ metrics.subscription_details.status }}{% if metrics.subscription_details.status_description %} — {{ metrics.subscription_details.status_description }}{% endif %}
-Hosts remaining,{{ metrics.subscription_details.hosts_remaining }}
+{% set status_line = metrics.subscription_details.status %}{% if metrics.subscription_details.status_description %}{% set status_line = status_line ~ ' — ' ~ metrics.subscription_details.status_description %}{% endif %}
+Status,{{ status_line | replace('\r', '') | replace('\n', ' ') }}
 Subscription type,{{ metrics.subscription_details.subscription_type }}
-Expires on,{{ metrics.subscription_details.expires_on }}
-Automation controller version,{{ metrics.subscription_details.automation_controller_version }}
+Subscription (SKU),{{ metrics.subscription_details.subscription_sku }}
+Trial,{{ metrics.subscription_details.trial }}
+Hosts remaining,{{ metrics.subscription_details.hosts_remaining }}
+Hosts imported,{{ metrics.subscription_details.hosts_imported }}
 Hosts automated,{{ metrics.subscription_details.hosts_automated }}
 Hosts deleted,{{ metrics.subscription_details.hosts_deleted }}
-Subscription (SKU),{{ metrics.subscription_details.subscription_sku }}
-Expires on UTC,{{ metrics.subscription_details.expires_on_utc }}
-Hosts imported,{{ metrics.subscription_details.hosts_imported }}
 Active hosts previously deleted,{{ metrics.subscription_details.active_hosts_previously_deleted }}
-Trial,{{ metrics.subscription_details.trial }}
+Expires on,{{ metrics.subscription_details.expires_on }}
+Expires on UTC,{{ metrics.subscription_details.expires_on_utc }}
 Days remaining,{{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}
+Automation controller version,{{ metrics.subscription_details.automation_controller_version }}
 
 {% endif %}
 Organization Node and Subscription Metrics
@@ -38,7 +39,7 @@ Organization,Max Nodes,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,U
 
 Node Details by Organization
 
-Node,Subscription,Organizations
+Node,Subscription,Organizations,Last Automation,Automated Counter,Deleted Counter
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
@@ -50,7 +51,7 @@ Node,Subscription,Organizations
 {% endif %}
 {% endfor %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %},"{{ org_names }}"
+{% set _la = node.last_automation | default('', true) | string %}{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %},"{{ org_names }}",{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
 {% endif %}
 {% endfor %}
 
@@ -60,7 +61,7 @@ Node,First Automation,Last Automation,Last Deleted,Automated Counter,Deleted Cou
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-{{ node.nodename }},{{ node.first_automation | default('', true) | string }},{{ node.last_automation | default('', true) | string }},{{ node.last_deleted | default('', true) | string }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
+{% set _fa = node.first_automation | default('', true) | string %}{% set _la = node.last_automation | default('', true) | string %}{% set _ld = node.last_deleted | default('', true) | string %}{{ node.nodename }},{{ _fa.split('T')[0] if _fa and 'T' in _fa else _fa }},{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ _ld.split('T')[0] if _ld and 'T' in _ld else _ld }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
 {% endif %}
 {% endfor %}
 {% endif %}

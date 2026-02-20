@@ -1,3 +1,4 @@
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('', true)) }}{% endmacro %}
 {
   "report": {
     "title": "Ansible Automation Platform Node Metrics Report",
@@ -20,6 +21,7 @@
     "active_hosts_previously_deleted": {% if metrics.subscription_details.active_hosts_previously_deleted is string %}"{{ metrics.subscription_details.active_hosts_previously_deleted }}"{% else %}{{ metrics.subscription_details.active_hosts_previously_deleted }}{% endif %},
     "trial": "{{ metrics.subscription_details.trial }}",
     "days_remaining": {% if metrics.subscription_details.days_remaining is not none %}{{ metrics.subscription_details.days_remaining }}{% else %}null{% endif %}
+
   },
 {% endif %}
   "organizations": [
@@ -44,34 +46,25 @@
   ],
 {% if show_node_details | default(true) | bool %}
   "nodes_with_organizations": [
-{% set ns = namespace(first_with_orgs=true) %}
-{% for node in metrics.nodes %}
-{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
-{% if has_orgs %}
-{% if not ns.first_with_orgs %},
-{% endif %}
+{% for node in metrics.nodes if (node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0) %}
     {
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
+      "last_automation": {{ date_only(node.last_automation) | tojson }},
+      "automated_counter": {{ node.automated_counter | default('', true) | tojson }},
+      "deleted_counter": {{ node.deleted_counter | default('', true) | tojson }},
       "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]
-    }
-{% set ns.first_with_orgs = false %}
+    }{% if not loop.last %},
 {% endif %}
 {% endfor %}
   ],
   "orphaned_nodes": [
-{% set ns = namespace(first_orphan=true) %}
-{% for node in metrics.nodes %}
-{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
-{% if not has_orgs %}
-{% if not ns.first_orphan %},
-{% endif %}
+{% for node in metrics.nodes if not (node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0) %}
     {
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
       "organizations": []
-    }
-{% set ns.first_orphan = false %}
+    }{% if not loop.last %},
 {% endif %}
 {% endfor %}
   ],
@@ -81,5 +74,6 @@
     "{{ org_id }}": "{{ org_name }}"{% if not loop.last %},
 {% endif %}
 {% endfor %}
+
   }
 }

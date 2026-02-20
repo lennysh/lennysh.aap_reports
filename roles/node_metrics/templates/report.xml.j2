@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('', true)) }}{% endmacro %}
 <report>
     <title>Ansible Automation Platform Node Metrics Report</title>
     <aap_url>{{ metrics.aap_url }}</aap_url>
@@ -47,6 +48,9 @@
         <node>
             <nodename>{{ node.nodename }}</nodename>
             <license>{{ node.license | lower }}</license>
+            <last_automation>{{ date_only(node.last_automation) }}</last_automation>
+            <automated_counter>{{ node.automated_counter | default('', true) }}</automated_counter>
+            <deleted_counter>{{ node.deleted_counter | default('', true) }}</deleted_counter>
             <organizations>
 {% for org_id in node.organizations %}
                 <organization_id>{{ org_id }}</organization_id>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('', true)) }}{% endmacro %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -162,8 +163,18 @@
         .notes li strong {
             color: rgba(0, 0, 0, 0.9);
         }
-        /* Node details table - Organizations column left-aligned */
-        .node-details-table td:nth-child(3) {
+        /* Node details tables: first column left; rest centered */
+        .node-details-table th:first-child,
+        .node-details-table td:first-child {
+            text-align: left;
+        }
+        .node-details-table th:not(:first-child),
+        .node-details-table td:not(:first-child) {
+            text-align: center;
+        }
+        /* Node Details by Organization only: 3rd column (Organizations) also left-aligned */
+        .node-details-org-table th:nth-child(3),
+        .node-details-org-table td:nth-child(3) {
             text-align: left;
         }
         .subscription-details-table th {
@@ -178,6 +189,10 @@
         }
         .status-out-of-compliance {
             color: #c9190b;
+            font-weight: 600;
+        }
+        .status-compliant {
+            color: #3e8635;
             font-weight: 600;
         }
         .description-inline {
@@ -201,39 +216,39 @@
             <tbody>
                 <tr>
                     <th scope="row">Status</th>
-                    <td colspan="5">{% if metrics.subscription_details.status == "Out of compliance" %}<span class="status-out-of-compliance">{{ metrics.subscription_details.status }}</span>{% else %}{{ metrics.subscription_details.status }}{% endif %}{% if metrics.subscription_details.status_description %}<br><span class="description-inline">{{ metrics.subscription_details.status_description }}</span>{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Hosts remaining</th>
-                    <td>{{ metrics.subscription_details.hosts_remaining }}</td>
-                    <th scope="row">Hosts automated</th>
-                    <td>{{ metrics.subscription_details.hosts_automated }}</td>
-                    <th scope="row">Hosts imported</th>
-                    <td>{{ metrics.subscription_details.hosts_imported }}</td>
+                    <td colspan="5">{% if metrics.subscription_details.status == "Out of compliance" %}<span class="status-out-of-compliance">{{ metrics.subscription_details.status }}</span>{% else %}{% if metrics.subscription_details.status == "Compliant" %}<span class="status-compliant">{{ metrics.subscription_details.status }}</span>{% else %}{{ metrics.subscription_details.status }}{% endif %}{% endif %}{% if metrics.subscription_details.status_description %}<br><span class="description-inline">{{ metrics.subscription_details.status_description }}</span>{% endif %}</td>
                 </tr>
                 <tr>
                     <th scope="row">Subscription type</th>
                     <td>{{ metrics.subscription_details.subscription_type }}</td>
-                    <th scope="row">Hosts deleted</th>
-                    <td>{{ metrics.subscription_details.hosts_deleted }}</td>
-                    <th scope="row">Active hosts previously deleted</th>
-                    <td>{{ metrics.subscription_details.active_hosts_previously_deleted }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Expires on</th>
-                    <td>{{ metrics.subscription_details.expires_on }}</td>
                     <th scope="row">Subscription (SKU)</th>
                     <td>{{ metrics.subscription_details.subscription_sku }}</td>
                     <th scope="row">Trial</th>
                     <td>{{ metrics.subscription_details.trial }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">Automation controller version</th>
-                    <td>{{ metrics.subscription_details.automation_controller_version }}</td>
+                    <th scope="row">Hosts remaining</th>
+                    <td>{{ metrics.subscription_details.hosts_remaining }}</td>
+                    <th scope="row">Hosts imported</th>
+                    <td>{{ metrics.subscription_details.hosts_imported }}</td>
+                    <th scope="row">Hosts automated</th>
+                    <td>{{ metrics.subscription_details.hosts_automated }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Hosts deleted</th>
+                    <td>{{ metrics.subscription_details.hosts_deleted }}</td>
+                    <th scope="row">Active hosts previously deleted</th>
+                    <td>{{ metrics.subscription_details.active_hosts_previously_deleted }}</td>
+                    <th scope="row">Expires on</th>
+                    <td>{{ metrics.subscription_details.expires_on }}</td>
+                </tr>
+                <tr>
                     <th scope="row">Expires on UTC</th>
                     <td>{{ metrics.subscription_details.expires_on_utc }}</td>
                     <th scope="row">Days remaining</th>
                     <td>{{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}</td>
+                    <th scope="row">Automation controller version</th>
+                    <td>{{ metrics.subscription_details.automation_controller_version }}</td>
                 </tr>
             </tbody>
         </table>
@@ -253,14 +268,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for org in metrics.organizations %}
-                {% if org.max_hosts is none %}
-                {% set max_hosts_display = "" %}
-                {% elif org.max_hosts == 0 %}
-                {% set max_hosts_display = "Unlimited" %}
-                {% else %}
-                {% set max_hosts_display = org.max_hosts | string %}
-                {% endif %}
+{% for org in metrics.organizations -%}
+{%- if org.max_hosts is none -%}
+{%- set max_hosts_display = "" -%}
+{%- elif org.max_hosts == 0 -%}
+{%- set max_hosts_display = "Unlimited" -%}
+{%- else -%}
+{%- set max_hosts_display = org.max_hosts | string -%}
+{%- endif %}
                 <tr{% if org.id == -1 %} class="total-row"{% endif %}>
                     <td{% if org.id == -1 %} style="font-weight: 600;"{% endif %}>{{ org.name }}</td>
                     <td>{{ max_hosts_display }}</td>
@@ -269,7 +284,7 @@
                     <td>{% if org.id == -1 %}{{ org.unique_licenses }}{% else %}{{ org.unique_licenses }} ({{ org.unique_licenses_pct }}%){% endif %}</td>
                     <td>{% if org.shared_licenses is none %}{% elif org.id == -1 %}{{ org.shared_licenses }}{% else %}{{ org.shared_licenses }} ({{ org.shared_licenses_pct }}%){% endif %}</td>
                 </tr>
-                {% endfor %}
+{% endfor %}
             </tbody>
         </table>
         </div>
@@ -279,37 +294,41 @@
             Nodes that have at least one organization, with subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
         </div>
         <div class="table-wrapper">
-        <table class="node-details-table">
+        <table class="node-details-table node-details-org-table">
             <thead>
                 <tr>
                     <th>Node</th>
                     <th>Subscription</th>
                     <th>Organizations</th>
+                    <th>Last Automation</th>
+                    <th>Automated Counter</th>
+                    <th>Deleted Counter</th>
                 </tr>
             </thead>
             <tbody>
-                {% for node in metrics.nodes %}
-                {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
-                {% if has_orgs %}
+                {% for node in metrics.nodes -%}
+                {%- set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+                {%- if has_orgs -%}
                 <tr>
                     <td>{{ node.nodename }}</td>
                     <td class="{% if node.license %}check-green{% else %}check-red{% endif %}">
-                        {% if node.license %}✓{% else %}✗{% endif %}
+                        {%- if node.license %}✓{% else %}✗{%- endif -%}
                     </td>
-                    <td>
-                        {% set org_names_parts = [] %}
-                        {% for org_id, org_name in metrics.organization_names.items() %}
-                        {% set org_id_int = org_id | int %}
-                        {% if org_id_int in node.organizations %}
-                        {% set _ = org_names_parts.append(org_name) %}
-                        {% endif %}
-                        {% endfor %}
-                        {% set org_names = org_names_parts | sort | join(", ") %}
-                        {{ org_names }}
-                    </td>
+                    <td>{% set org_names_parts = [] -%}
+                        {%- for org_id, org_name in metrics.organization_names.items() -%}
+                        {%- set org_id_int = org_id | int %}
+                        {%- if org_id_int in node.organizations %}
+                        {%- set _ = org_names_parts.append(org_name) %}
+                        {%- endif %}
+                        {%- endfor -%}
+                        {%- set org_names = org_names_parts | sort | join(", ") -%}
+                        {{ org_names }}</td>
+                    <td>{{ date_only(node.last_automation) }}</td>
+                    <td>{{ node.automated_counter | default('', true) }}</td>
+                    <td>{{ node.deleted_counter | default('', true) }}</td>
                 </tr>
                 {% endif %}
-                {% endfor %}
+                {%- endfor -%}
             </tbody>
         </table>
         </div>
@@ -330,19 +349,19 @@
                 </tr>
             </thead>
             <tbody>
-                {% for node in metrics.nodes %}
-                {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
-                {% if not has_orgs %}
+                {% for node in metrics.nodes -%}
+                {%- set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+                {%- if not has_orgs -%}
                 <tr>
                     <td>{{ node.nodename }}</td>
-                    <td>{{ node.first_automation | default('', true) }}</td>
-                    <td>{{ node.last_automation | default('', true) }}</td>
-                    <td>{{ node.last_deleted | default('', true) }}</td>
+                    <td>{{ date_only(node.first_automation) }}</td>
+                    <td>{{ date_only(node.last_automation) }}</td>
+                    <td>{{ date_only(node.last_deleted) }}</td>
                     <td>{{ node.automated_counter | default('', true) }}</td>
                     <td>{{ node.deleted_counter | default('', true) }}</td>
                 </tr>
                 {% endif %}
-                {% endfor %}
+                {%- endfor -%}
             </tbody>
         </table>
         </div>

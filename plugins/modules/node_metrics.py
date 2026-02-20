@@ -307,11 +307,12 @@ def build_subscription_details(config_json):
         version = config_json.get("version") or "(placeholder)"
 
         compliant = license_info.get("compliant", True)
-        status = "Out of compliance" if not compliant else "In compliance"
+        status = "Out of compliance" if not compliant else "Compliant"
         status_description = (
             "You have automated against more hosts than your subscription allows."
             if not compliant
-            else ""
+            else
+            "The number of hosts you have automated against is below your subscription count."
         )
 
         free_instances = license_info.get("free_instances")

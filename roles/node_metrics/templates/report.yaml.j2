@@ -1,4 +1,5 @@
 ---
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('', true)) }}{% endmacro %}
 report:
   title: "Ansible Automation Platform Node Metrics Report"
   aap_url: "{{ metrics.aap_url }}"
@@ -56,6 +57,9 @@ nodes_with_organizations:
 {% if has_orgs %}
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
+    last_automation: {{ date_only(node.last_automation) | tojson }}
+    automated_counter: {{ node.automated_counter | default('', true) | tojson }}
+    deleted_counter: {{ node.deleted_counter | default('', true) | tojson }}
     organizations:
 {% for org_id in node.organizations %}
       - {{ org_id }}

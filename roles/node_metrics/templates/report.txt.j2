@@ -12,19 +12,20 @@ Subscription Details
 {% set value_width = 50 %}
 {{ pad("Field", label_width) }}| {{ pad("Value", value_width) }}
 {{ "-" * label_width }}+ {{ "-" * value_width }}
-{{ pad("Status", label_width) }}| {{ metrics.subscription_details.status }}{% if metrics.subscription_details.status_description %} — {{ metrics.subscription_details.status_description }}{% endif %}
-{{ pad("Hosts remaining", label_width) }}| {{ metrics.subscription_details.hosts_remaining }}
+{% set status_line = metrics.subscription_details.status %}{% if metrics.subscription_details.status_description %}{% set status_line = status_line ~ ' — ' ~ metrics.subscription_details.status_description %}{% endif %}
+{{ pad("Status", label_width) }}| {{ status_line | replace('\r', '') | replace('\n', ' ') }}
 {{ pad("Subscription type", label_width) }}| {{ metrics.subscription_details.subscription_type }}
-{{ pad("Expires on", label_width) }}| {{ metrics.subscription_details.expires_on }}
-{{ pad("Automation controller version", label_width) }}| {{ metrics.subscription_details.automation_controller_version }}
+{{ pad("Subscription (SKU)", label_width) }}| {{ metrics.subscription_details.subscription_sku }}
+{{ pad("Trial", label_width) }}| {{ metrics.subscription_details.trial }}
+{{ pad("Hosts remaining", label_width) }}| {{ metrics.subscription_details.hosts_remaining }}
+{{ pad("Hosts imported", label_width) }}| {{ metrics.subscription_details.hosts_imported }}
 {{ pad("Hosts automated", label_width) }}| {{ metrics.subscription_details.hosts_automated }}
 {{ pad("Hosts deleted", label_width) }}| {{ metrics.subscription_details.hosts_deleted }}
-{{ pad("Subscription (SKU)", label_width) }}| {{ metrics.subscription_details.subscription_sku }}
-{{ pad("Expires on UTC", label_width) }}| {{ metrics.subscription_details.expires_on_utc }}
-{{ pad("Hosts imported", label_width) }}| {{ metrics.subscription_details.hosts_imported }}
 {{ pad("Active hosts previously deleted", label_width) }}| {{ metrics.subscription_details.active_hosts_previously_deleted }}
-{{ pad("Trial", label_width) }}| {{ metrics.subscription_details.trial }}
+{{ pad("Expires on", label_width) }}| {{ metrics.subscription_details.expires_on }}
+{{ pad("Expires on UTC", label_width) }}| {{ metrics.subscription_details.expires_on_utc }}
 {{ pad("Days remaining", label_width) }}| {{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}
+{{ pad("Automation controller version", label_width) }}| {{ metrics.subscription_details.automation_controller_version }}
 
 {% endif %}
 ================================================================================
@@ -87,13 +88,15 @@ Organization Node and Subscription Metrics
 Node Details by Organization
 ================================================================================
 
-Nodes that have at least one organization, with subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
+Nodes that have at least one organization, with subscription consumption status (Subscription column: "Yes (consuming)" or "No (not consuming)") and organization membership (comma-separated list of organizations).
 
 {% set node_name_width = 25 %}
 {% set sub_width = 30 %}
 {% set org_col_width = 50 %}
-{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}
-{{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}
+{% set la_width = 28 %}
+{% set counter_width = 8 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}| {{ pad("Last Automation", la_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}
+{{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}+ {{ "-" * la_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
@@ -110,7 +113,11 @@ Nodes that have at least one organization, with subscription consumption status 
 {% endif %}
 {% endfor %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ org_names }}
+{% set org_display = org_names[:org_col_width] if (org_names | length) > org_col_width else org_names %}
+{% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
+{% set ac = node.automated_counter | default('', true) | string %}
+{% set dc = node.deleted_counter | default('', true) | string %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}
 {% endif %}
 {% endfor %}
 
@@ -127,9 +134,9 @@ Nodes that are currently consuming a subscription but do not belong to any organ
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-{% set fa = node.first_automation | default('', true) | string %}
-{% set la = node.last_automation | default('', true) | string %}
-{% set ld = node.last_deleted | default('', true) | string %}
+{% set fa = node.first_automation | default('', true) | string %}{% set fa = fa.split('T')[0] if fa and 'T' in fa else fa %}
+{% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
+{% set ld = node.last_deleted | default('', true) | string %}{% set ld = ld.split('T')[0] if ld and 'T' in ld else ld %}
 {% set ac = node.automated_counter | default('', true) | string %}
 {% set dc = node.deleted_counter | default('', true) | string %}
 {{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}

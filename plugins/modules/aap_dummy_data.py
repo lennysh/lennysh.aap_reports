@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: aap_dummy_data
 short_description: Generate dummy AAP organization, inventory, and host data as JSON (no API calls)
-version_added: "1.0.0"
+version_added: "1.0.4"
 description:
     - Generates the same dummy data structure that M(lennysh.aap_reports.aap_populate_dummy) would create,
       but returns it as JSON only. No connection to AAP is made; use the returned data to loop in
@@ -69,6 +69,7 @@ options:
         type: int
         default: 0
 author: "Lenny Shirley (@lennysh)"
+...
 '''
 
 EXAMPLES = r'''
@@ -90,6 +91,7 @@ EXAMPLES = r'''
   ansible.builtin.debug:
     msg: "Host {{ item.name }} in inventory_id {{ item.inventory_id }}, enabled={{ item.enabled }}"
   loop: "{{ dummy.hosts }}"
+...
 '''
 
 RETURN = r'''
@@ -110,7 +112,12 @@ hosts:
     returned: always
     type: list
     elements: dict
-    sample: [ {"name": "host1", "inventory_id": 1, "organization_id": 1, "enabled": true, "variables": "{\\"ansible_connection\\": \\"local\\"}"} ]
+    sample:
+        - name: host1
+          inventory_id: 1
+          organization_id: 1
+          enabled: true
+          variables: '{"ansible_connection": "local"}'
 '''
 
 

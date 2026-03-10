@@ -13,3 +13,4 @@ galaxy_info:
 
 dependencies: []
 # Requires collections: ansible.controller, ansible.platform, lennysh.aap_reports.
+...

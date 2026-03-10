@@ -95,7 +95,7 @@ We welcome feedback and contributions.
 
 * **Feature requests, bugs:** Open a [GitHub Issue](https://github.com/lennysh/lennysh.aap_reports/issues) and choose the appropriate template (Feature request or Bug report).
 * **Questions, usage help, or chat:** Join the [Matrix channel](https://matrix.to/#/#lennysh-aap-reports:matrix.org).
-* **Code or doc changes:** Open a Pull Request. The repo uses a [pull request template](.github/PULL_REQUEST_TEMPLATE.md) to capture description, type of change, and a short checklist.
+* **Code or doc changes:** Open a Pull Request.
 
 ## License
 

@@ -23,20 +23,29 @@ jobs:
       - name: Extract version from release tag
         id: version
         run: |
-          # Get the version from the release tag, remove 'v' prefix if present
-          VERSION="${GITHUB_REF#refs/tags/}"
-          VERSION="${VERSION#v}"
-          # Remove '-devel' suffix if present
-          VERSION="${VERSION%-devel}"
+          # Use tag name only when this run was triggered by a release (GITHUB_REF = refs/tags/...)
+          VERSION=""
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            RAW="${GITHUB_REF#refs/tags/}"
+            VERSION="${RAW#v}"
+            VERSION="${VERSION%-devel}"
+          fi
+          # Fallback: read from galaxy.yml (e.g. 1.0.4-devel -> 1.0.4)
+          if [ -z "$VERSION" ]; then
+            VERSION=$(grep -E '^version:\s*' galaxy.yml | sed -E 's/^version:\s*//' | sed 's/-devel$//')
+          fi
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not determine version. GITHUB_REF=$GITHUB_REF (use a tag like v1.0.4 when creating the release) or set version in galaxy.yml."
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
       - name: Update galaxy.yml with release version
         run: |
-          # Use sed to replace the version in galaxy.yml
           sed -i "s/^version:.*/version: ${{ steps.version.outputs.version }}/" galaxy.yml
           echo "Updated galaxy.yml version to ${{ steps.version.outputs.version }}"
-          cat galaxy.yml | grep "^version:"
+          grep "^version:" galaxy.yml
 
       - name: Build collection
         run: |
@@ -44,11 +53,17 @@ jobs:
 
       - name: Publish to Ansible Galaxy
         run: |
-          ansible-galaxy collection publish lennysh-aap_reports-*.tar.gz --token "${{ secrets.ANSIBLE_GALAXY_API_KEY }}"
+          TARBALL="lennysh-aap_reports-${{ steps.version.outputs.version }}.tar.gz"
+          if [ ! -f "$TARBALL" ]; then
+            echo "::error::Built tarball not found: $TARBALL"
+            ls -la *.tar.gz 2>/dev/null || true
+            exit 1
+          fi
+          ansible-galaxy collection publish "$TARBALL" --token "${{ secrets.ANSIBLE_GALAXY_API_KEY }}"
 
       - name: Upload collection artifact
         uses: actions/upload-artifact@v4
         with:
           name: collection-artifact
-          path: lennysh-aap_reports-*.tar.gz
+          path: lennysh-aap_reports-${{ steps.version.outputs.version }}.tar.gz
           retention-days: 30

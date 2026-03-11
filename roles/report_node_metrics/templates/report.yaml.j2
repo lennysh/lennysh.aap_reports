@@ -60,7 +60,6 @@ nodes_with_organizations:
 {% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
 {% endfor %}
 {% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
-
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
     last_automation: {{ date_only(node.last_automation) | tojson }}
@@ -77,6 +76,7 @@ nodes_with_organizations:
       inv_org: "{{ last_job_org.inventory_organization | default('') }}"
       username: "{{ last_job_org.username | default('') }}"{% endif %}
 {% endif %}
+
 {% endfor %}
 
 orphaned_nodes:
@@ -88,7 +88,6 @@ orphaned_nodes:
 {% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
 {% endfor %}
 {% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
-
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
     organizations: []
@@ -99,7 +98,7 @@ orphaned_nodes:
       inv_org: "{{ last_job.inventory_organization | default('') }}"
       username: "{{ last_job.username | default('') }}"{% endif %}
 {% endif %}
-{% endfor %}
+{% endfor %} 
 {% endif %}
 
 organization_names:

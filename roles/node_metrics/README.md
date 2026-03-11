@@ -37,7 +37,7 @@ The `node_metrics` role connects to the AAP Controller API, collects organizatio
 | `node_metrics_output_folder` | `{{ playbook_dir }}` | Directory where report files will be written |
 | `node_metrics_output_filename` | `aap_node_metrics_report` | Base filename (file extension added automatically based on format) |
 | `node_metrics_show_node_details` | `true` | Whether to include the "Node Details by Organization" section in reports |
-| `node_metrics_include_jobs_with_hosts` | `false` | When `true`, fetches Controller API data via `ansible.builtin.uri` (orgs, jobs, job host summaries) and adds last job info (Job ID, template, organization, user) to both **Node Details by Organization** and **Orphaned Nodes** tables. Data is stored in reusable vars for the run. |
+| `node_metrics_include_jobs_with_hosts` | `false` | When `true`, fetches Controller API data (orgs, jobs, job host summaries) and adds last-job columns to **Node Details by Organization** and **Orphaned Nodes** tables: **Job ID**, **Inventory** (inventory name), **Inv. Org** (inventory organization), and **User**. Data is stored in reusable vars for the run. |
 | `node_metrics_controller_page_size` | `200` | Page size for Controller API pagination (organizations, jobs, job_host_summaries). |
 | `node_metrics_controller_request_delay` | `0.15` | Seconds to pause between Controller API requests. |
 | `node_metrics_output_formats` | `[markdown]` | List of formats to generate. Options: `markdown`, `csv`, `html`, `json`, `yaml`, `xml`, `txt` |
@@ -58,7 +58,8 @@ The role supports generating reports in the following formats:
 
 The role uses separate, reusable roles to fetch Controller data via `ansible.builtin.uri`. Each controller role sets Ansible facts that the next role or `node_metrics` uses. API path is detected automatically (AAP 2.4 `/api/v2` vs AAP 2.5+ `/api/controller/v2`).
 
-- **Roles used (in order):** `controller_detect`, `controller_fetch_organizations`, `controller_fetch_config`, `controller_fetch_host_metrics`, `controller_fetch_inventories`, then (per inventory) `controller_fetch_inventory_hosts`. Optionally when jobs-with-hosts is enabled: `controller_fetch_jobs`, then (per job) `controller_fetch_job_host_summaries`, then `controller_build_jobs_with_hosts`. These roles live alongside `node_metrics` in the repo and can be reused by other playbooks or roles.
+- **Detect:** `controller_detect` runs only when `controller_api_base_path` is not already set (e.g. it is skipped if `controller_token` login already ran it in the same play).
+- **Roles used (in order):** `controller_detect` (when needed), `controller_fetch_organizations`, `controller_fetch_config`, `controller_fetch_host_metrics`, `controller_fetch_inventories`, then (per inventory) `controller_fetch_inventory_hosts`. Optionally when jobs-with-hosts is enabled: `controller_fetch_jobs`, then (per job) `controller_fetch_job_host_summaries`, then `controller_build_jobs_with_hosts`. These roles live alongside `node_metrics` in the repo and can be reused by other playbooks or roles.
 - **Node_metrics-specific (still in this role):** `tasks/controller/build_metrics.yml` (runs `files/build_metrics.py`). This role then sets `node_metrics_jobs_with_hosts` from `controller_jobs_with_hosts` when jobs-with-hosts is enabled.
 - **Shared vars (always set):** `controller_api_base_path`, `controller_organizations`, `controller_config`, `controller_host_metrics`, `controller_inventories`, `controller_inventory_hosts`. The role then runs the build_metrics script to produce `node_metrics_data`.
 - **When `node_metrics_include_jobs_with_hosts` is true:** `controller_jobs_raw`, `controller_job_host_summaries`, and `node_metrics_jobs_with_hosts` are also set.
@@ -224,6 +225,7 @@ If `/config` is unavailable or fails, this section is omitted and the rest of th
 - Complete list of all nodes
 - Subscription consumption status for each node
 - **Organizations**: Comma-delimited list of organization names that each node belongs to (sorted alphabetically)
+- When `node_metrics_include_jobs_with_hosts` is true, each node row also shows **Last Job ID**, **Inventory** (inventory name for the most recent job that targeted that node), **Inv. Org** (that inventory’s organization), and **User**
 
 ## License
 

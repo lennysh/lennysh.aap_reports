@@ -11,10 +11,17 @@ Builds a list of jobs with hostnames from Controller API data already in facts. 
 ## Output (fact set)
 
 - `controller_jobs_with_hosts` – list of job dicts, each with:
-  - `id`, `username`, `organization`, `inventory_organization`, `job_template`
+  - `job_template_id` – job id (from API)
+  - `username` – created_by username or launched_by name
+  - `job_template_organization`, `job_template_organization_id` – job template’s org
+  - `inventory`, `inventory_id` – inventory name and id
+  - `inventory_organization`, `inventory_organization_id` – inventory’s org (resolved from `controller_organizations`)
+  - `job_template` – job template name
   - `project_id`, `project_name`
   - `created`, `started`, `finished`
   - `hostnames` – deduped, sorted, lowercase list of host names for that job
+
+Reports that use this data (e.g. node_metrics with `node_metrics_include_jobs_with_hosts`) show **Inventory** (inventory name) and **Inv. Org** (inventory organization) columns from these fields.
 
 ## Example
 

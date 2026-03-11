@@ -31,17 +31,17 @@ Obtains (login) and revokes (logout) AAP Controller OAuth2 tokens. By default th
       block:
         - name: Login and get token
           ansible.builtin.include_role:
-            name: controller_token
+            name: lennysh.aap_reports.controller_token
 
         - name: Your tasks here (aap_token is set)
           ansible.builtin.include_role:
-            name: node_metrics
+            name: lennysh.aap_reports.node_metrics
           # or other roles that use aap_token
 
       always:
         - name: Logout (revoke token)
           ansible.builtin.include_role:
-            name: controller_token
+            name: lennysh.aap_reports.controller_token
           vars:
             controller_token_action: logout
 ```
@@ -49,14 +49,15 @@ Obtains (login) and revokes (logout) AAP Controller OAuth2 tokens. By default th
 ## Example: login only
 
 ```yaml
-- include_role: name: controller_token
+- ansible.builtin.include_role:
+    name: controller_token
 # aap_token and token_url are set for subsequent tasks
 ```
 
 ## Example: logout only (e.g. if token was created earlier)
 
 ```yaml
-- include_role:
+- ansible.builtin.include_role:
     name: controller_token
   vars:
     controller_token_action: logout

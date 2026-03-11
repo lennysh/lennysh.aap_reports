@@ -33,15 +33,17 @@ This collection includes the following roles:
 
 | Role | Description | Documentation |
 |------|-------------|---------------|
-| `lennysh.aap_reports.node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Includes a Subscription Details section (from controller `/config` when available) plus organization-level node and subscription metrics, max hosts limits, unique vs shared nodes/subscriptions, and detailed node-by-node breakdowns with organization membership. | [Role README](roles/node_metrics/README.md) |
+| `lennysh.aap_reports.node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Includes a Subscription Details section (from controller `/config` when available) plus organization-level node and subscription metrics, max hosts limits, unique vs shared nodes/subscriptions, and detailed node-by-node breakdowns with organization membership. Optionally includes last-job columns (Job ID, Inventory, Inv. Org, User) when `node_metrics_include_jobs_with_hosts` is true. Uses internal controller_* roles for API path detection and data fetching. | [Role README](roles/node_metrics/README.md) |
+
+**Controller roles** (used by node_metrics; reusable in playbooks): `controller_detect` (API path), `controller_token` (OAuth2 login/logout), `controller_fetch_*` (organizations, config, host_metrics, inventories, jobs, job host summaries), `controller_build_jobs_with_hosts`. See each role’s README under `roles/` for details.
 
 ## Plugins
 
-This collection includes the following modules:
+This collection includes the following plugins:
 
-| Module | Description | Documentation |
+| Plugin | Description | Documentation |
 |--------|-------------|---------------|
-| `lennysh.aap_reports.node_metrics` | Collects node metrics data from AAP Controller API. Returns structured JSON data that can be used with Ansible templates to generate custom reports. | [Plugins README](plugins/README.md) |
+| `lennysh.aap_reports.node_metrics` (module) | Collects node metrics data from AAP Controller API. Returns structured JSON data that can be used with Ansible templates to generate custom reports. | [Plugins README](plugins/README.md) |
 
 ## Quick Start
 

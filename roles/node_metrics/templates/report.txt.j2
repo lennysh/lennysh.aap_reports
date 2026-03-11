@@ -2,7 +2,7 @@ Ansible Automation Platform Node Metrics Report
 AAP Instance: {{ metrics.aap_url }}
 Generated: {{ metrics.generated_at }}
 
-{% macro pad(text, width) %}{{ text }}{{ " " * (width - text | length) }}{% endmacro %}
+{% macro pad(text, width) %}{% set _t = text | default('', true) %}{{ _t }}{{ " " * (width - _t | length) }}{% endmacro %}
 {% if metrics.subscription_details is defined and metrics.subscription_details %}
 ================================================================================
 Subscription Details
@@ -128,7 +128,7 @@ Nodes that have at least one organization, with subscription consumption status 
 {% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
 {% set ac = node.automated_counter | default('', true) | string %}
 {% set dc = node.deleted_counter | default('', true) | string %}
-{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job_org.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job_org.inventory | default(''), template_width) }} | {{ pad(last_job_org.inventory_organization | default(''), org_width) }} | {{ pad(last_job_org.username | default(''), user_width) }}{% endif %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job_org.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job_org.inventory | default('', true), template_width) }} | {{ pad(last_job_org.inventory_organization | default('', true), org_width) }} | {{ pad(last_job_org.username | default('', true), user_width) }}{% endif %}
 
 {% endif %}
 {% endfor %}
@@ -158,7 +158,7 @@ Nodes that are currently consuming a subscription but do not belong to any organ
 {% set ld = node.last_deleted | default('', true) | string %}{% set ld = ld.split('T')[0] if ld and 'T' in ld else ld %}
 {% set ac = node.automated_counter | default('', true) | string %}
 {% set dc = node.deleted_counter | default('', true) | string %}
-{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job.inventory | default(''), template_width) }} | {{ pad(last_job.inventory_organization | default(''), org_width) }} | {{ pad(last_job.username | default(''), user_width) }}{% endif %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job.inventory | default('', true), template_width) }} | {{ pad(last_job.inventory_organization | default('', true), org_width) }} | {{ pad(last_job.username | default('', true), user_width) }}{% endif %}
 
 {% endif %}
 {% endfor %}

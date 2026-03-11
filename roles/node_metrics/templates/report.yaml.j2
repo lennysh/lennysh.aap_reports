@@ -60,6 +60,7 @@ nodes_with_organizations:
 {% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
 {% endfor %}
 {% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
+
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
     last_automation: {{ date_only(node.last_automation) | tojson }}
@@ -68,7 +69,8 @@ nodes_with_organizations:
     organizations:
 {% for org_id in node.organizations %}
       - {{ org_id }}
-{% endfor %}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job_org %}
+{% endfor %}
+{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job_org %}
     last_job:
       id: {{ last_job_org.job_template_id }}
       inventory: "{{ last_job_org.inventory | default('') }}"
@@ -86,9 +88,11 @@ orphaned_nodes:
 {% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
 {% endfor %}
 {% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
+
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
-    organizations: []{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job %}
+    organizations: []
+{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job %}
     last_job:
       id: {{ last_job.job_template_id }}
       inventory: "{{ last_job.inventory | default('') }}"

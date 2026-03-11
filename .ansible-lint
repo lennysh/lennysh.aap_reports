@@ -14,6 +14,7 @@ exclude_paths:
   - changelogs/
   - .ansible/
   - tests/
+  - ignore_*
 
 # quiet: true
 # strict: true
@@ -24,7 +25,19 @@ mock_modules:
   - lennysh.aap_reports.node_metrics
 
 mock_roles:
+  - lennysh.aap_reports.aap_dummy_populate
+  - lennysh.aap_reports.controller_build_jobs_with_hosts
+  - lennysh.aap_reports.controller_fetch_config
+  - lennysh.aap_reports.controller_fetch_host_metrics
+  - lennysh.aap_reports.controller_fetch_inventories
+  - lennysh.aap_reports.controller_fetch_inventory_hosts
+  - lennysh.aap_reports.controller_fetch_job_host_summaries
+  - lennysh.aap_reports.controller_fetch_jobs
+  - lennysh.aap_reports.controller_fetch_organizations
+  - lennysh.aap_reports.controller_jobs_with_hosts
+  - lennysh.aap_reports.controller_token
   - lennysh.aap_reports.node_metrics
+  - lennysh.aap_reports.metrics_utility
 
 # Enable checking of loop variable prefixes in roles
 # loop_var_prefix: ^(__|{role}_)

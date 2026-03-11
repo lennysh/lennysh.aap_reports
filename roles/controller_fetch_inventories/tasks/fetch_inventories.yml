@@ -4,7 +4,7 @@
 
 - name: Fetch inventories page {{ controller_fetch_page | default(1) }}
   ansible.builtin.uri:
-    url: "{{ aap_url }}{{ controller_api_base_path }}/inventories/?page={{ controller_fetch_page | default(1) }}&page_size={{ node_metrics_controller_page_size | default(200) }}"
+    url: "{{ aap_url }}{{ controller_api_base_path }}/inventories/?page={{ controller_fetch_page | default(1) }}&page_size={{ controller_page_size }}"
     method: GET
     user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
     password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
@@ -21,7 +21,7 @@
 
 - name: Brief pause between API requests (inventories)
   ansible.builtin.pause:
-    seconds: "{{ node_metrics_controller_request_delay | default(0.15) }}"
+    seconds: "{{ controller_request_delay }}"
     prompt: ""
   when: (controller_inv_page.json.next | default('', true)) | length > 0
 

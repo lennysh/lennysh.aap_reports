@@ -2,12 +2,12 @@
 galaxy_info:
   author: Lenny Shirley
   description: Fetch job_host_summaries for one AAP Controller job (paginated). Merges into controller_job_host_summaries. Call with current_job_id. Requires controller_detect.
-  company: Red Hat
   license: MIT
   min_ansible_version: "2.15.0"
   galaxy_tags:
     - aap
     - controller
     - api
-dependencies: []
+dependencies:
+  - role: global_vars
 ...

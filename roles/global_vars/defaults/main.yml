@@ -1,0 +1,10 @@
+---
+# Shared vars for Controller API usage. Used by controller_fetch_* roles and any play/role that calls them.
+# Override these when including roles that depend on global_vars (e.g. report_node_metrics, report_ee_metrics).
+
+# Page size for Controller API paginated list endpoints (organizations, jobs, host_metrics, inventories, etc.).
+controller_page_size: 200
+
+# Seconds to pause between Controller API requests (throttling).
+controller_request_delay: 0.15
+...

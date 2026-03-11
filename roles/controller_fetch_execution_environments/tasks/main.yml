@@ -1,0 +1,8 @@
+---
+- name: Fetch Controller execution environments (paginated)
+  ansible.builtin.include_tasks: fetch_execution_environments.yml
+
+- name: Sort execution environments by name
+  ansible.builtin.set_fact:
+    controller_execution_environments: "{{ controller_execution_environments | default([]) | sort(attribute='name') }}"
+...

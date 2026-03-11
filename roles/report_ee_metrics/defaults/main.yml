@@ -1,0 +1,12 @@
+---
+report_ee_metrics_output_folder: "{{ playbook_dir }}"
+report_ee_metrics_output_filename: "aap_ee_metrics_report"
+report_ee_metrics_output_formats:
+  - markdown
+  - csv
+  - html
+  - json
+  - yaml
+  - xml
+  - txt
+...

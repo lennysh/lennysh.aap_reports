@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Export EE metrics report (from controller_build_ee_metrics) to multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT).
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - execution
+    - environment
+    - reports
+dependencies:
+  - role: global_vars
+...

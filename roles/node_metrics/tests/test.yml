@@ -1,7 +1,0 @@
----
-- name: Test node_metrics role
-  hosts: localhost
-  gather_facts: false
-  remote_user: root
-  roles:
-    - node_metrics

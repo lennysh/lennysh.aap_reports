@@ -1,0 +1,17 @@
+---
+title: "Ansible Automation Platform - Execution Environment Metrics Report"
+generated_at: {{ generated_at | tojson }}
+aap_url: {{ aap_url | tojson }}
+
+execution_environments:
+{% for row in report %}
+  - name: {{ row.name | default('') | tojson }}
+    created_by_username: {{ row.created_by_username | default('') | tojson }}
+    created: {{ (row.created | default('')) | tojson }}
+    modified_by_username: {{ row.modified_by_username | default('') | tojson }}
+    modified: {{ (row.modified | default('')) | tojson }}
+    organization_name: {{ row.organization_name | default('') | tojson }}
+    last_used_by_job: {% if row.last_used_by_job is none %}null{% else %}{{ row.last_used_by_job | tojson }}{% endif %}
+
+{% endfor %}
+...

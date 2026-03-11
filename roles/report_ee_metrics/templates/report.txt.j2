@@ -1,0 +1,31 @@
+Ansible Automation Platform - Execution Environment Metrics Report
+Generated: {{ generated_at }}
+{% if aap_url %}AAP Instance: {{ aap_url }}{% endif %}
+
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('')) }}{% endmacro %}
+{% macro pad(text, width) %}{% set _t = text | default('', true) %}{% set _display = _t[:width] if (_t | length > width) else _t %}{{ _display }}{{ " " * (width - (_display | length)) }}{% endmacro %}
+{% macro cell(text, width) %}{% set _inner = [width - 2, 0] | max %}{{ " " }}{{ pad(text, _inner) }}{{ " " }}{% endmacro %}
+
+{% set w = namespace(name=4, created_by=11, created=7, modified_by=12, last_mod=14, org=12, last_used=18) %}
+{% for row in report %}
+{% set _n = (row.name | default('')) | length %}
+{% if _n > w.name %}{% set w.name = _n %}{% endif %}
+{% set _cb = (row.created_by_username | default('')) | length %}
+{% if _cb > w.created_by %}{% set w.created_by = _cb %}{% endif %}
+{% set _c = (date_only(row.created)) | length %}
+{% if _c > w.created %}{% set w.created = _c %}{% endif %}
+{% set _mb = (row.modified_by_username | default('')) | length %}
+{% if _mb > w.modified_by %}{% set w.modified_by = _mb %}{% endif %}
+{% set _lm = (date_only(row.modified)) | length %}
+{% if _lm > w.last_mod %}{% set w.last_mod = _lm %}{% endif %}
+{% set _o = (row.organization_name | default('')) | length %}
+{% if _o > w.org %}{% set w.org = _o %}{% endif %}
+{% set _lu = (date_only(row.last_used_by_job) if row.last_used_by_job else '') | length %}
+{% if _lu > w.last_used %}{% set w.last_used = _lu %}{% endif %}
+{% endfor %}
+
+{{ cell("Name", w.name + 2) }} | {{ cell("Created By", w.created_by + 2) }} | {{ cell("Created", w.created + 2) }} | {{ cell("Modified By", w.modified_by + 2) }} | {{ cell("Last Modified", w.last_mod + 2) }} | {{ cell("Organization", w.org + 2) }} | {{ cell("Last Used By Job", w.last_used + 2) }}
+{{ "-" * (w.name + 2) }} + {{ "-" * (w.created_by + 2) }} + {{ "-" * (w.created + 2) }} + {{ "-" * (w.modified_by + 2) }} + {{ "-" * (w.last_mod + 2) }} + {{ "-" * (w.org + 2) }} + {{ "-" * (w.last_used + 2) }}
+{% for row in report %}
+{{ cell(row.name | default(''), w.name + 2) }} | {{ cell(row.created_by_username | default(''), w.created_by + 2) }} | {{ cell(date_only(row.created), w.created + 2) }} | {{ cell(row.modified_by_username | default(''), w.modified_by + 2) }} | {{ cell(date_only(row.modified), w.last_mod + 2) }} | {{ cell(row.organization_name | default(''), w.org + 2) }} | {{ cell(date_only(row.last_used_by_job) if row.last_used_by_job else '', w.last_used + 2) }}
+{% endfor %}

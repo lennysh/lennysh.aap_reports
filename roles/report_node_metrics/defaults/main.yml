@@ -1,0 +1,16 @@
+---
+report_node_metrics_output_folder: "{{ playbook_dir }}"
+report_node_metrics_output_filename: "aap_node_metrics_report"
+report_node_metrics_show_node_details: true
+# When true, fetch Controller API data via URI (orgs, jobs, job_host_summaries) and add last-job info to reports
+report_node_metrics_include_jobs_with_hosts: false
+# Controller API pagination/throttling: see global_vars role (controller_page_size, controller_request_delay)
+report_node_metrics_output_formats:
+  - markdown
+  - csv
+  - html
+  - json
+  - yaml
+  - xml
+  - txt
+...

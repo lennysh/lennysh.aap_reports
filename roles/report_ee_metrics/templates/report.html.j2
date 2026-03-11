@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+{% macro date_only(v) %}{{ (v | default('', true)).split('T')[0] if (v | default('', true)) and 'T' in (v | default('', true)) else (v | default('')) }}{% endmacro %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAP Execution Environment Metrics Report</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background-color: rgb(34, 34, 34); color: rgba(255, 255, 255, 0.9); line-height: 1.5; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .content-card { background-color: rgb(255, 255, 255); color: rgb(34, 34, 34); border-radius: 4px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+        h1 { color: rgb(34, 34, 34); font-size: 1.75rem; font-weight: 600; margin: 0 0 16px 0; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+        .generated { color: rgba(0, 0, 0, 0.7); font-size: 0.875rem; margin-bottom: 24px; padding: 12px; background-color: rgba(0, 0, 0, 0.02); border-radius: 4px; }
+        .table-wrapper { width: 100%; overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background-color: rgb(255, 255, 255); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 4px; overflow: hidden; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+        th { background-color: rgba(0, 0, 0, 0.06); font-weight: 600; font-size: 0.875rem; }
+        tr:hover { background-color: rgba(0, 0, 0, 0.02); }
+        .name-cell { max-width: 400px; word-break: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-card">
+            <h1>Execution Environment Metrics Report</h1>
+            <div class="generated">
+                <strong>Generated:</strong> {{ generated_at }}{% if aap_url %} &nbsp;|&nbsp; <strong>AAP Instance:</strong> {{ aap_url }}{% endif %}
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Created By</th>
+                            <th>Created</th>
+                            <th>Modified By</th>
+                            <th>Last Modified</th>
+                            <th>Organization</th>
+                            <th>Last Used By Job</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+{% for row in report %}
+                        <tr>
+                            <td class="name-cell">{{ row.name | default('') }}</td>
+                            <td>{{ row.created_by_username | default('') }}</td>
+                            <td>{{ date_only(row.created) }}</td>
+                            <td>{{ row.modified_by_username | default('') }}</td>
+                            <td>{{ date_only(row.modified) }}</td>
+                            <td>{{ row.organization_name | default('') }}</td>
+                            <td>{{ date_only(row.last_used_by_job) if row.last_used_by_job else '—' }}</td>
+                        </tr>
+{% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

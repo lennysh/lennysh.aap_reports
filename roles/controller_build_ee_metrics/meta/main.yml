@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Build EE metrics report (one row per execution environment with name, created_by, modified_by, modified, organization, last_used_by_job). Requires controller_execution_environments and controller_jobs_raw.
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - api
+    - execution
+    - environment
+    - metrics
+dependencies: []
+...

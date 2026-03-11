@@ -33,9 +33,11 @@ This collection includes the following roles:
 
 | Role | Description | Documentation |
 |------|-------------|---------------|
-| `lennysh.aap_reports.node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Includes a Subscription Details section (from controller `/config` when available) plus organization-level node and subscription metrics, max hosts limits, unique vs shared nodes/subscriptions, and detailed node-by-node breakdowns with organization membership. Optionally includes last-job columns (Job ID, Inventory, Inv. Org, User) when `node_metrics_include_jobs_with_hosts` is true. Uses internal controller_* roles for API path detection and data fetching. | [Role README](roles/node_metrics/README.md) |
+| `lennysh.aap_reports.report_node_metrics` | Generates node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT). Includes a Subscription Details section (from controller `/config` when available) plus organization-level node and subscription metrics, max hosts limits, unique vs shared nodes/subscriptions, and detailed node-by-node breakdowns with organization membership. Optionally includes last-job columns (Job ID, Inventory, Inv. Org, User) when `report_node_metrics_include_jobs_with_hosts` is true. Depends on **global_vars** and uses controller_* roles for API path detection and data fetching. | [Role README](roles/report_node_metrics/README.md) |
+| `lennysh.aap_reports.report_ee_metrics` | Generates Execution Environment (EE) metrics reports from AAP Controller in multiple formats. Fetches execution environments and jobs, builds a report (name, created/modified by, organization, last used by job), and exports to markdown, CSV, HTML, JSON, YAML, XML, TXT. Depends on **global_vars** and uses controller_detect, controller_fetch_execution_environments, controller_fetch_jobs, controller_build_ee_metrics. | [Role README](roles/report_ee_metrics/README.md) |
+| `lennysh.aap_reports.global_vars` | Shared default variables for Controller API usage (`controller_page_size`, `controller_request_delay`). No tasks; included as a dependency by report and controller_fetch_* roles. | [Role README](roles/global_vars/README.md) |
 
-**Controller roles** (used by node_metrics; reusable in playbooks): `controller_detect` (API path), `controller_token` (OAuth2 login/logout), `controller_fetch_*` (organizations, config, host_metrics, inventories, jobs, job host summaries), `controller_build_jobs_with_hosts`. See each role’s README under `roles/` for details.
+**Controller roles** (reusable in playbooks; many depend on **global_vars**): `controller_detect` (API path), `controller_token` (OAuth2 login/logout), `controller_fetch_*` (organizations, config, host_metrics, inventories, inventory_hosts, jobs, job_host_summaries, execution_environments), `controller_build_jobs_with_hosts`, `controller_build_ee_metrics`. See each role’s README under `roles/` for details.
 
 ## Plugins
 
@@ -47,7 +49,7 @@ This collection includes the following plugins:
 
 ## Quick Start
 
-### Using the Node Metrics Role
+### Using the Node Metrics Report Role
 
 ```yaml
 ---
@@ -56,30 +58,47 @@ This collection includes the following plugins:
   gather_facts: false
   
   roles:
-    - role: lennysh.aap_reports.node_metrics
+    - role: lennysh.aap_reports.report_node_metrics
       vars:
         aap_url: "https://aap.example.com"
         aap_username: "admin"
         aap_password: "{{ vault_aap_password }}"
-        node_metrics_output_formats:
+        report_node_metrics_output_formats:
           - markdown
           - csv
           - html
 ```
 
-For detailed usage instructions, see the [node_metrics role documentation](roles/node_metrics/README.md).
+For detailed usage instructions, see the [report_node_metrics role documentation](roles/report_node_metrics/README.md).
+
+### Using the EE Metrics Report Role
+
+```yaml
+---
+- name: Generate AAP EE Metrics Reports
+  hosts: localhost
+  gather_facts: true
+  tasks:
+    - ansible.builtin.include_role:
+        name: lennysh.aap_reports.report_ee_metrics
+      vars:
+        aap_url: "https://aap.example.com"
+        aap_username: "admin"
+        aap_password: "{{ vault_aap_password }}"
+        report_ee_metrics_output_formats:
+          - csv
+          - html
+```
+
+See the [report_ee_metrics role documentation](roles/report_ee_metrics/README.md) for more options.
 
 ## Report Examples
 
 Example reports in all supported formats are available in the [`report_examples/`](report_examples/) directory:
 
-- [Markdown](report_examples/aap_node_metrics_report.md)
-- [CSV](report_examples/aap_node_metrics_report.csv)
-- [HTML](report_examples/aap_node_metrics_report.html)
-- [JSON](report_examples/aap_node_metrics_report.json)
-- [YAML](report_examples/aap_node_metrics_report.yaml)
-- [XML](report_examples/aap_node_metrics_report.xml)
-- [TXT](report_examples/aap_node_metrics_report.txt)
+**Node metrics** ([`report_examples/node_metrics_reports/`](report_examples/node_metrics_reports/)): [Markdown](report_examples/node_metrics_reports/aap_node_metrics_report.md), [CSV](report_examples/node_metrics_reports/aap_node_metrics_report.csv), [HTML](report_examples/node_metrics_reports/aap_node_metrics_report.html), [JSON](report_examples/node_metrics_reports/aap_node_metrics_report.json), [YAML](report_examples/node_metrics_reports/aap_node_metrics_report.yaml), [XML](report_examples/node_metrics_reports/aap_node_metrics_report.xml), [TXT](report_examples/node_metrics_reports/aap_node_metrics_report.txt).
+
+**EE metrics** ([`report_examples/ee_metrics_reports/`](report_examples/ee_metrics_reports/)): [Markdown](report_examples/ee_metrics_reports/aap_ee_metrics_report.md), [CSV](report_examples/ee_metrics_reports/aap_ee_metrics_report.csv), [HTML](report_examples/ee_metrics_reports/aap_ee_metrics_report.html), [JSON](report_examples/ee_metrics_reports/aap_ee_metrics_report.json), [YAML](report_examples/ee_metrics_reports/aap_ee_metrics_report.yaml), [XML](report_examples/ee_metrics_reports/aap_ee_metrics_report.xml), [TXT](report_examples/ee_metrics_reports/aap_ee_metrics_report.txt).
 
 ## Security Notes
 
@@ -106,5 +125,4 @@ MIT
 ## Author Information
 
 - **Author**: Lenny Shirley
-- **Company**: Red Hat
 - **Issue Tracker**: https://github.com/lennysh/lennysh.aap_reports/issues

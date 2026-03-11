@@ -2,7 +2,6 @@
 galaxy_info:
   author: Lenny Shirley
   description: Build a list of jobs with hostnames from controller_organizations, controller_jobs_raw, and controller_job_host_summaries. Sets controller_jobs_with_hosts. No API calls.
-  company: Red Hat
   license: MIT
   min_ansible_version: "2.15.0"
   galaxy_tags:

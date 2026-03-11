@@ -21,22 +21,26 @@ Builds a list of jobs with hostnames from Controller API data already in facts. 
   - `created`, `started`, `finished`
   - `hostnames` – deduped, sorted, lowercase list of host names for that job
 
-Reports that use this data (e.g. node_metrics with `node_metrics_include_jobs_with_hosts`) show **Inventory** (inventory name) and **Inv. Org** (inventory organization) columns from these fields.
+Reports that use this data (e.g. report_node_metrics with `report_node_metrics_include_jobs_with_hosts`) show **Inventory** (inventory name) and **Inv. Org** (inventory organization) columns from these fields.
 
 ## Example
 
 ```yaml
-- include_role: name: controller_detect
-- include_role: name: controller_fetch_organizations
-- include_role: name: controller_fetch_jobs
+- ansible.builtin.include_role:
+    name: controller_detect
+- ansible.builtin.include_role:
+    name: controller_fetch_organizations
+- ansible.builtin.include_role:
+    name: controller_fetch_jobs
 - name: Init job host summaries
-  set_fact:
+  ansible.builtin.set_fact:
     controller_job_host_summaries: {}
-- include_role:
+- ansible.builtin.include_role:
     name: controller_fetch_job_host_summaries
   vars:
     current_job_id: "{{ item }}"
   loop: "{{ controller_jobs_raw | map(attribute='id') | list }}"
-- include_role: name: controller_build_jobs_with_hosts
+- ansible.builtin.include_role:
+    name: controller_build_jobs_with_hosts
 # controller_jobs_with_hosts is now set
 ```

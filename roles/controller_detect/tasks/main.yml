@@ -3,7 +3,7 @@
 # Sets controller_api_base_path for use by other controller roles/tasks.
 # Expects aap_url, and either aap_token or (aap_username + aap_password). Optional aap_validate_certs.
 
-- name: Try AAP 2.5+ API path (/api/controller/v2)
+- name: Try New API path (/api/controller/v2)
   ansible.builtin.uri:
     url: "{{ aap_url }}/api/controller/v2/organizations/?page=1&page_size=1"
     method: GET
@@ -24,7 +24,7 @@
     - controller_api_try_25 is defined
     - not controller_api_try_25.failed | default(true)
 
-- name: Try AAP 2.4 API path (/api/v2)
+- name: Try Legacy API path (/api/v2)
   ansible.builtin.uri:
     url: "{{ aap_url }}/api/v2/organizations/?page=1&page_size=1"
     method: GET

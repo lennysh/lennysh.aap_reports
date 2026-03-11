@@ -14,14 +14,14 @@ Detects the AAP Controller API base path by trying `/api/controller/v2` (AAP 2.5
 
 ## Reuse
 
-Run this role before any `controller_fetch_*` role so they have `controller_api_base_path` available. The `controller_token` role (login) and the `node_metrics` role run `controller_detect` when needed; `node_metrics` skips it if `controller_api_base_path` is already set (e.g. after a prior `controller_token` login). Example:
+Run this role before any `controller_fetch_*` role so they have `controller_api_base_path` available. The `controller_token` role (login), `report_node_metrics`, and `report_ee_metrics` roles run `controller_detect` when needed; they skip it if `controller_api_base_path` is already set (e.g. after a prior `controller_token` login). Example:
 
 ```yaml
 - name: Detect API path
-  include_role:
+  ansible.builtin.include_role:
     name: controller_detect
 
 - name: Fetch organizations
-  include_role:
+  ansible.builtin.include_role:
     name: controller_fetch_organizations
 ```

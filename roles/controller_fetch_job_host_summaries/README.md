@@ -8,7 +8,7 @@ Fetches job host summaries for one job (paginated) and merges them into `control
 - `controller_api_base_path` (from `controller_detect` or equivalent)
 - `current_job_id` – job ID for this run (set by the caller)
 - `controller_job_host_summaries` – dict to merge into (initialize to `{}` before first call)
-- Optional: `aap_validate_certs`, `node_metrics_controller_page_size`, `node_metrics_controller_request_delay`
+- Optional: `aap_validate_certs`, `controller_page_size`, `controller_request_delay` (defaults from **global_vars** role)
 
 ## Facts set
 

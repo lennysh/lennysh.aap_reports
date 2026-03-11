@@ -2,12 +2,12 @@
 galaxy_info:
   author: Lenny Shirley
   description: Fetch hosts for one AAP Controller inventory (paginated). Merges into controller_inventory_hosts. Call with current_inv_id. Requires controller_detect.
-  company: Red Hat
   license: MIT
   min_ansible_version: "2.15.0"
   galaxy_tags:
     - aap
     - controller
     - api
-dependencies: []
+dependencies:
+  - role: global_vars
 ...

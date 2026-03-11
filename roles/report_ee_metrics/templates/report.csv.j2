@@ -1,0 +1,8 @@
+Ansible Automation Platform - Execution Environment Metrics Report
+Generated: {{ generated_at }}
+AAP Instance: {{ aap_url }}
+
+Name,Created By,Created,Modified By,Last Modified,Organization,Last Used By Job
+{% for row in report %}
+"{{ (row.name | default('')) | replace('"', '""') }}","{{ (row.created_by_username | default('')) | replace('"', '""') }}",{{ (row.created | default('')) | string | replace(',', ' ') }},"{{ (row.modified_by_username | default('')) | replace('"', '""') }}",{{ (row.modified | default('')) | string | replace(',', ' ') }},"{{ (row.organization_name | default('')) | replace('"', '""') }}",{{ (row.last_used_by_job | default('')) | string | replace(',', ' ') }}
+{% endfor %}

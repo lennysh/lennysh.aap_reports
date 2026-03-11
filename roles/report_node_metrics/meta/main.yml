@@ -1,0 +1,16 @@
+galaxy_info:
+  author: Lenny Shirley
+  description: Generate node metrics reports from AAP Controller in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT).
+  issue_tracker_url: https://github.com/lennysh/lennysh.aap_reports/issues
+  license: MIT
+  min_ansible_version: 2.15.0
+  galaxy_tags:
+    - aap
+    - reports
+    - automation
+    - ansible
+    - host
+    - metrics
+dependencies:
+  - role: global_vars
+...

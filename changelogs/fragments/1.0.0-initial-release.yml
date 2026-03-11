@@ -2,7 +2,7 @@
 major_changes:
   - Initial release of the `lennysh.aap_reports` collection
   - Added `node_metrics` module for collecting node and subscription metrics from Ansible Automation Platform Controller
-  - Added `node_metrics` role for generating reports in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT)
+  - Added `report_node_metrics` role for generating node metrics reports in multiple formats (markdown, CSV, HTML, JSON, YAML, XML, TXT)
 
 minor_changes:
   - Support for both token-based and username/password authentication

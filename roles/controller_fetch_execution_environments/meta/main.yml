@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Fetch all AAP Controller execution environments (paginated). Sets controller_execution_environments. Requires controller_detect (controller_api_base_path).
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - api
+    - execution
+    - environment
+dependencies:
+  - role: global_vars
+...

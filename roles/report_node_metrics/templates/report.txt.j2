@@ -1,0 +1,174 @@
+Ansible Automation Platform Node Metrics Report
+AAP Instance: {{ metrics.aap_url }}
+Generated: {{ metrics.generated_at }}
+
+{% macro pad(text, width) %}{% set _t = text | default('', true) %}{{ _t }}{{ " " * (width - _t | length) }}{% endmacro %}
+{% if metrics.subscription_details is defined and metrics.subscription_details %}
+================================================================================
+Subscription Details
+================================================================================
+
+{% set label_width = 35 %}
+{% set value_width = 50 %}
+{{ pad("Field", label_width) }}| {{ pad("Value", value_width) }}
+{{ "-" * label_width }}+ {{ "-" * value_width }}
+{% set status_line = metrics.subscription_details.status %}{% if metrics.subscription_details.status_description %}{% set status_line = status_line ~ ' — ' ~ metrics.subscription_details.status_description %}{% endif %}
+{{ pad("Status", label_width) }}| {{ status_line | replace('\r', '') | replace('\n', ' ') }}
+{{ pad("Subscription type", label_width) }}| {{ metrics.subscription_details.subscription_type }}
+{{ pad("Subscription (SKU)", label_width) }}| {{ metrics.subscription_details.subscription_sku }}
+{{ pad("Trial", label_width) }}| {{ metrics.subscription_details.trial }}
+{{ pad("Hosts remaining", label_width) }}| {{ metrics.subscription_details.hosts_remaining }}
+{{ pad("Hosts imported", label_width) }}| {{ metrics.subscription_details.hosts_imported }}
+{{ pad("Hosts automated", label_width) }}| {{ metrics.subscription_details.hosts_automated }}
+{{ pad("Hosts deleted", label_width) }}| {{ metrics.subscription_details.hosts_deleted }}
+{{ pad("Active hosts previously deleted", label_width) }}| {{ metrics.subscription_details.active_hosts_previously_deleted }}
+{{ pad("Expires on", label_width) }}| {{ metrics.subscription_details.expires_on }}
+{{ pad("Expires on UTC", label_width) }}| {{ metrics.subscription_details.expires_on_utc }}
+{{ pad("Days remaining", label_width) }}| {{ metrics.subscription_details.days_remaining if metrics.subscription_details.days_remaining is not none else '(placeholder)' }}
+{{ pad("Automation controller version", label_width) }}| {{ metrics.subscription_details.automation_controller_version }}
+
+{% endif %}
+================================================================================
+Organization Node and Subscription Metrics
+================================================================================
+
+{% set org_name_width = 40 %}
+{% set col_width = 18 %}
+{{ pad("Organization Name", org_name_width) }}| {{ pad("Max Nodes", col_width) }}| {{ pad("Unique Nodes", col_width) }}| {{ pad("Shared Nodes", col_width) }}| {{ pad("Unique Subs", col_width) }}| {{ pad("Shared Subs", col_width) }}
+{{ "-" * org_name_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}+ {{ "-" * col_width }}
+{% for org in metrics.organizations %}
+{% if org.id == -1 %}
+{% set org_name = "**" + org.name + "**" %}
+{% if org.max_hosts is none %}
+{% set max_hosts = "N/A" %}
+{% elif org.max_hosts == 0 %}
+{% set max_hosts = "Unlimited" %}
+{% else %}
+{% set max_hosts = org.max_hosts | string %}
+{% endif %}
+{% set unique_nodes = org.unique_nodes | string %}
+{% if org.shared_nodes is not none %}
+{% set shared_nodes = org.shared_nodes | string %}
+{% else %}
+{% set shared_nodes = "N/A" %}
+{% endif %}
+{% set unique_licenses = org.unique_licenses | string %}
+{% if org.shared_licenses is not none %}
+{% set shared_licenses = org.shared_licenses | string %}
+{% else %}
+{% set shared_licenses = "N/A" %}
+{% endif %}
+{% else %}
+{% set org_name = org.name %}
+{% if org.max_hosts is none %}
+{% set max_hosts = "N/A" %}
+{% elif org.max_hosts == 0 %}
+{% set max_hosts = "Unlimited" %}
+{% else %}
+{% set max_hosts = org.max_hosts | string %}
+{% endif %}
+{% set unique_nodes = org.unique_nodes | string + " (" + org.unique_nodes_pct | string + "%)" %}
+{% if org.shared_nodes is not none %}
+{% set shared_nodes = org.shared_nodes | string + " (" + org.shared_nodes_pct | string + "%)" %}
+{% else %}
+{% set shared_nodes = "N/A" %}
+{% endif %}
+{% set unique_licenses = org.unique_licenses | string + " (" + org.unique_licenses_pct | string + "%)" %}
+{% if org.shared_licenses is not none %}
+{% set shared_licenses = org.shared_licenses | string + " (" + org.shared_licenses_pct | string + "%)" %}
+{% else %}
+{% set shared_licenses = "N/A" %}
+{% endif %}
+{% endif %}
+{{ pad(org_name, org_name_width) }}| {{ pad(max_hosts, col_width) }}| {{ pad(unique_nodes, col_width) }}| {{ pad(shared_nodes, col_width) }}| {{ pad(unique_licenses, col_width) }}| {{ pad(shared_licenses, col_width) }}
+{% endfor %}
+
+{% if show_node_details | default(true) | bool %}
+================================================================================
+Node Details by Organization
+================================================================================
+
+Nodes that have at least one organization, with subscription consumption status (Subscription column: "Yes (consuming)" or "No (not consuming)") and organization membership (comma-separated list of organizations).
+
+{% set node_name_width = 25 %}
+{% set sub_width = 30 %}
+{% set org_col_width = 50 %}
+{% set la_width = 28 %}
+{% set counter_width = 8 %}
+{% set job_id_width = 10 %}
+{% set template_width = 24 %}
+{% set org_width = 20 %}
+{% set user_width = 12 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}| {{ pad("Last Automation", la_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad("Job ID", job_id_width) }} | {{ pad("Inventory", template_width) }} | {{ pad("Inv. Org", org_width) }} | {{ pad("User", user_width) }}{% endif %}
+
+{{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}+ {{ "-" * la_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}+ {{ "-" * job_id_width }}+ {{ "-" * template_width }}+ {{ "-" * org_width }}+ {{ "-" * user_width }}{% endif %}
+
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
+{% if node.license %}
+{% set subscription = "Yes (consuming)" %}
+{% else %}
+{% set subscription = "No (not consuming)" %}
+{% endif %}
+{% set org_names_parts = [] %}
+{% for org_id, org_name in metrics.organization_names.items() %}
+{% set org_id_int = org_id | int %}
+{% if org_id_int in node.organizations %}
+{% set _ = org_names_parts.append(org_name) %}
+{% endif %}
+{% endfor %}
+{% set org_names = org_names_parts | sort | join(", ") %}
+{% set org_display = org_names[:org_col_width] if (org_names | length) > org_col_width else org_names %}
+{% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
+{% set ac = node.automated_counter | default('', true) | string %}
+{% set dc = node.deleted_counter | default('', true) | string %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job_org.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job_org.inventory | default('', true), template_width) }} | {{ pad(last_job_org.inventory_organization | default('', true), org_width) }} | {{ pad(last_job_org.username | default('', true), user_width) }}{% endif %}
+
+{% endif %}
+{% endfor %}
+
+================================================================================
+Orphaned Nodes
+================================================================================
+
+Nodes that are currently consuming a subscription but do not belong to any organization.
+
+{% set ts_width = 28 %}
+{% set counter_width = 8 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("First Automation", ts_width) }}| {{ pad("Last Automation", ts_width) }}| {{ pad("Last Deleted", ts_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad("Job ID", job_id_width) }} | {{ pad("Inventory", template_width) }} | {{ pad("Inv. Org", org_width) }} | {{ pad("User", user_width) }}{% endif %}
+
+{{ "-" * node_name_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}+ {{ "-" * job_id_width }}+ {{ "-" * template_width }}+ {{ "-" * org_width }}+ {{ "-" * user_width }}{% endif %}
+
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
+{% set fa = node.first_automation | default('', true) | string %}{% set fa = fa.split('T')[0] if fa and 'T' in fa else fa %}
+{% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
+{% set ld = node.last_deleted | default('', true) | string %}{% set ld = ld.split('T')[0] if ld and 'T' in ld else ld %}
+{% set ac = node.automated_counter | default('', true) | string %}
+{% set dc = node.deleted_counter | default('', true) | string %}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job.inventory | default('', true), template_width) }} | {{ pad(last_job.inventory_organization | default('', true), org_width) }} | {{ pad(last_job.username | default('', true), user_width) }}{% endif %}
+
+{% endif %}
+{% endfor %}
+{% endif %}
+
+================================================================================
+Notes
+================================================================================
+
+- Unique Nodes: Nodes that exist only in this organization
+- Shared Nodes: Nodes that exist in multiple organizations
+- Unique Subscriptions: Subscription-consuming nodes (from node metrics report) that exist only in this organization
+- Shared Subscriptions: Subscription-consuming nodes (from node metrics report) that exist in multiple organizations

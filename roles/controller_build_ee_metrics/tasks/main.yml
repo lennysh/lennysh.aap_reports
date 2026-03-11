@@ -1,0 +1,34 @@
+---
+# Build ee_metrics_report from controller_execution_environments and controller_jobs_raw.
+# No API calls. One row per EE: name, created_by, modified_by, modified, organization_name, last_used_by_job (most recent job that used the EE).
+# Expects controller_execution_environments (from controller_fetch_execution_environments) and controller_jobs_raw (from controller_fetch_jobs).
+
+- name: Initialize ee_metrics_report list
+  ansible.builtin.set_fact:
+    ee_metrics_report: []
+
+- name: Build ee_metrics_report from execution environments and jobs
+  ansible.builtin.set_fact:
+    ee_metrics_report: "{{ (ee_metrics_report | default([])) + [_row] }}"
+  loop: "{{ controller_execution_environments | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    _ee: "{{ item }}"
+    _sf: "{{ _ee.summary_fields | default({}) }}"
+    _created_by: "{{ _sf.created_by | default({}) }}"
+    _modified_by: "{{ _sf.modified_by | default({}) }}"
+    _org: "{{ _sf.organization | default({}) }}"
+    _org_name: "{{ _org.name | default('') }}"
+    _jobs_using_ee: "{{ controller_jobs_raw | default([]) | selectattr('execution_environment', 'equalto', _ee.id) | list }}"
+    _finished_times: "{{ _jobs_using_ee | map(attribute='finished') | reject('none') | list }}"
+    _last_used: "{{ (_finished_times | max) if (_finished_times | length > 0) else none }}"
+    _row:
+      name: "{{ _ee.name }}"
+      created_by_username: "{{ _created_by.username | default('') }}"
+      created: "{{ _ee.created }}"
+      modified_by_username: "{{ _modified_by.username | default('') }}"
+      modified: "{{ _ee.modified }}"
+      organization_name: "{{ _org_name }}"
+      last_used_by_job: "{{ _last_used }}"
+...

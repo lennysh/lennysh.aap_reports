@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ee_metrics_report>
+  <title>Ansible Automation Platform - Execution Environment Metrics Report</title>
+  <generated_at>{{ generated_at }}</generated_at>
+  <aap_url>{{ aap_url }}</aap_url>
+  <execution_environments>
+{% for row in report %}
+    <execution_environment>
+      <name>{{ row.name | default('') }}</name>
+      <created_by_username>{{ row.created_by_username | default('') }}</created_by_username>
+      <created>{{ row.created | default('') }}</created>
+      <modified_by_username>{{ row.modified_by_username | default('') }}</modified_by_username>
+      <modified>{{ row.modified | default('') }}</modified>
+      <organization_name>{{ row.organization_name | default('') }}</organization_name>
+      <last_used_by_job>{% if row.last_used_by_job is none %}{% else %}{{ row.last_used_by_job }}{% endif %}</last_used_by_job>
+    </execution_environment>
+{% endfor %}
+  </execution_environments>
+</ee_metrics_report>

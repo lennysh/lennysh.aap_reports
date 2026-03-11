@@ -1,0 +1,44 @@
+---
+# Run the EE metrics pipeline (detect, fetch EEs, fetch jobs, build report) then export to multiple formats.
+# Can be used standalone with aap_url + credentials, or after controller_token so controller_api_base_path is already set.
+
+- name: Detect Controller API path (AAP 2.4 vs 2.5+)
+  ansible.builtin.include_role:
+    name: controller_detect
+  when: controller_api_base_path is not defined
+
+- name: Fetch Controller execution environments (paginated)
+  ansible.builtin.include_role:
+    name: controller_fetch_execution_environments
+
+- name: Fetch Controller jobs (paginated)
+  ansible.builtin.include_role:
+    name: controller_fetch_jobs
+
+- name: Build EE metrics report from execution environments and jobs
+  ansible.builtin.include_role:
+    name: controller_build_ee_metrics
+
+- name: Ensure output folder exists
+  ansible.builtin.file:
+    path: "{{ report_ee_metrics_output_folder }}"
+    state: directory
+    mode: "0755"
+
+- name: Gather date_time fact for report timestamp
+  ansible.builtin.setup:
+    gather_subset:
+      - date_time
+  when: report_ee_metrics_generated_at is not defined and ansible_date_time is not defined
+
+- name: Generate EE metrics report(s) using template(s)
+  ansible.builtin.template:
+    src: "{{ report_ee_metrics_format_templates[item] }}"
+    dest: "{{ report_ee_metrics_output_folder }}/{{ report_ee_metrics_output_filename }}.{{ report_ee_metrics_format_extensions[item] }}"
+    mode: "0644"
+  loop: "{{ report_ee_metrics_output_formats }}"
+  vars:
+    report: "{{ ee_metrics_report | default([]) }}"
+    generated_at: "{{ report_ee_metrics_generated_at | default(ansible_date_time.iso8601) }}"
+    aap_url: "{{ report_ee_metrics_aap_url | default('') }}"
+...

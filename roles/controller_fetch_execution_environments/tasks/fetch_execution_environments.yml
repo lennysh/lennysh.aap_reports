@@ -1,0 +1,38 @@
+---
+# Fetch all execution_environments (paginated). Recursively includes self for next page.
+# Dumps into controller_execution_environments (list). Uses controller_api_base_path.
+
+- name: Fetch execution environments page {{ controller_fetch_page | default(1) }}
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path }}/execution_environments/?page={{ controller_fetch_page | default(1) }}&page_size={{ controller_page_size }}"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_ee_page
+
+- name: Append execution environments page to controller_execution_environments
+  ansible.builtin.set_fact:
+    controller_execution_environments: "{{ (controller_execution_environments | default([])) + (controller_ee_page.json.results | default([])) }}"
+
+- name: Brief pause between API requests (execution environments)
+  ansible.builtin.pause:
+    seconds: "{{ controller_request_delay }}"
+    prompt: ""
+  when: (controller_ee_page.json.next | default('', true)) | length > 0
+
+- name: Set next execution environments page number
+  ansible.builtin.set_fact:
+    _controller_next_page: "{{ (controller_fetch_page | default(1)) | int + 1 }}"
+  when: (controller_ee_page.json.next | default('', true)) | length > 0
+
+- name: Fetch next execution environments page
+  ansible.builtin.include_tasks: fetch_execution_environments.yml
+  vars:
+    controller_fetch_page: "{{ _controller_next_page }}"
+  when: (controller_ee_page.json.next | default('', true)) | length > 0
+...

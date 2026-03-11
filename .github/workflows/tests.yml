@@ -47,7 +47,7 @@ jobs:
     strategy:
       matrix:
         role:
-          - node_metrics
+          - report_node_metrics
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

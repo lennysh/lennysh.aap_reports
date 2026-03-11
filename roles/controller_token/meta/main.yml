@@ -2,7 +2,6 @@
 galaxy_info:
   author: Lenny Shirley
   description: Obtain (login) and revoke (logout) AAP Controller OAuth2 tokens. Use in a block with always for cleanup.
-  company: Red Hat
   license: MIT
   min_ansible_version: "2.15.0"
   galaxy_tags:

@@ -1,0 +1,19 @@
+---
+report_node_metrics_format_extensions:
+  markdown: md
+  csv: csv
+  html: html
+  json: json
+  yaml: yaml
+  xml: xml
+  txt: txt
+
+report_node_metrics_format_templates:
+  markdown: report.md.j2
+  csv: report.csv.j2
+  html: report.html.j2
+  json: report.json.j2
+  yaml: report.yaml.j2
+  xml: report.xml.j2
+  txt: report.txt.j2
+...

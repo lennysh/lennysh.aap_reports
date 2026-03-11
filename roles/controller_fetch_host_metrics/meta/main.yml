@@ -2,12 +2,12 @@
 galaxy_info:
   author: Lenny Shirley
   description: Fetch all AAP Controller host_metrics (paginated). Sets controller_host_metrics. Requires controller_detect.
-  company: Red Hat
   license: MIT
   min_ansible_version: "2.15.0"
   galaxy_tags:
     - aap
     - controller
     - api
-dependencies: []
+dependencies:
+  - role: global_vars
 ...

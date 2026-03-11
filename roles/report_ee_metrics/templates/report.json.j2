@@ -1,0 +1,20 @@
+{
+  "title": "Ansible Automation Platform - Execution Environment Metrics Report",
+  "generated_at": "{{ generated_at | replace('"', '\\"') }}",
+  "aap_url": "{{ aap_url | replace('"', '\\"') }}",
+  "execution_environments": [
+{% for row in report %}
+    {
+      "name": "{{ (row.name | default('')) | replace('"', '\\"') }}",
+      "created_by_username": "{{ (row.created_by_username | default('')) | replace('"', '\\"') }}",
+      "created": "{{ (row.created | default('')) | replace('"', '\\"') }}",
+      "modified_by_username": "{{ (row.modified_by_username | default('')) | replace('"', '\\"') }}",
+      "modified": "{{ (row.modified | default('')) | replace('"', '\\"') }}",
+      "organization_name": "{{ (row.organization_name | default('')) | replace('"', '\\"') }}",
+      "last_used_by_job": {% if row.last_used_by_job is none %}null{% else %}"{{ (row.last_used_by_job | string) | replace('"', '\\"') }}"{% endif %}
+
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}

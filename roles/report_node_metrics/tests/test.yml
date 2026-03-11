@@ -1,0 +1,7 @@
+---
+- name: Test report_node_metrics role
+  hosts: localhost
+  gather_facts: false
+  remote_user: root
+  roles:
+    - report_node_metrics

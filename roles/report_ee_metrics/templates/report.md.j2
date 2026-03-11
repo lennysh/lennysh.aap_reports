@@ -1,0 +1,12 @@
+# Ansible Automation Platform - Execution Environment Metrics Report
+
+**Generated:** {{ generated_at }}  
+{% if aap_url %}**AAP Instance:** {{ aap_url }}{% endif %}  
+
+## Execution Environments
+
+| Name | Created By | Created | Modified By | Last Modified | Organization | Last Used By Job |
+|:-----|:----------|:-------|:------------|:-------------|:-------------|:-----------------|
+{% for row in report %}
+| {{ row.name | default('') }} | {{ row.created_by_username | default('') }} | {{ (row.created | default('', true)).split('T')[0] if (row.created | default('', true)) and 'T' in (row.created | default('', true)) else (row.created | default('')) }} | {{ row.modified_by_username | default('') }} | {{ (row.modified | default('', true)).split('T')[0] if (row.modified | default('', true)) and 'T' in (row.modified | default('', true)) else (row.modified | default('')) }} | {{ row.organization_name | default('') }} | {{ (row.last_used_by_job | default('', true)).split('T')[0] if (row.last_used_by_job | default('', true)) and 'T' in (row.last_used_by_job | default('', true)) else (row.last_used_by_job | default('—')) }} |
+{% endfor %}

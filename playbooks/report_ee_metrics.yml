@@ -1,0 +1,44 @@
+---
+- name: Generate AAP Node Metrics Reports
+  hosts: localhost
+  gather_facts: false
+  vars:
+    output_folder: "{{ playbook_dir }}"
+    output_filename: "aap_ee_metrics_report"
+    output_formats:
+      - markdown
+      - csv
+      - html
+      - json
+      - yaml
+      - xml
+      - txt
+
+  tasks:
+    - name: Token Lifecycle Block
+      block:
+        - name: Login and get OAuth2 token
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+
+        # - name: Display token info
+        #   ansible.builtin.debug:
+        #     msg:
+        #       - "Token URL: {{ token_url }}"
+        #       - "Token: {{ aap_token }}"
+
+        - name: Get EE metrics
+          vars:
+            report_ee_metrics_output_folder: "{{ output_folder }}"
+            report_ee_metrics_output_filename: "{{ output_filename }}"
+            report_ee_metrics_output_formats: "{{ output_formats }}"
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.report_ee_metrics
+
+      always:
+        - name: Logout (revoke token)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+          vars:
+            controller_token_action: logout
+...

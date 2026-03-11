@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Fetch AAP Controller /config. Sets controller_config. Requires controller_detect (controller_api_base_path).
+  company: Red Hat
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - api
+dependencies: []
+...

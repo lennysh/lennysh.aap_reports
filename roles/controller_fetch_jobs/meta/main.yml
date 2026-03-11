@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Fetch all AAP Controller jobs (paginated). Sets controller_jobs_raw. Requires controller_detect.
+  company: Red Hat
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - api
+dependencies: []
+...

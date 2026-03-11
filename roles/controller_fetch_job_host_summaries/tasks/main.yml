@@ -1,0 +1,5 @@
+---
+# Call with current_job_id (and optionally controller_fetch_page). Expects controller_job_host_summaries dict to exist.
+- name: Fetch job host summaries (paginated per job)
+  ansible.builtin.include_tasks: fetch_job_host_summaries.yml
+...

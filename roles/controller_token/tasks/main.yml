@@ -1,0 +1,14 @@
+---
+- name: Detect Controller API path (for login)
+  ansible.builtin.include_role:
+    name: controller_detect
+  when: (controller_token_action | default('login')) == 'login'
+
+- name: Login (obtain OAuth2 token)
+  ansible.builtin.include_tasks: login.yml
+  when: (controller_token_action | default('login')) == 'login'
+
+- name: Logout (revoke token)
+  ansible.builtin.include_tasks: logout.yml
+  when: (controller_token_action | default('login')) == 'logout'
+...

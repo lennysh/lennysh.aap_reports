@@ -95,11 +95,22 @@ Nodes that have at least one organization, with subscription consumption status 
 {% set org_col_width = 50 %}
 {% set la_width = 28 %}
 {% set counter_width = 8 %}
-{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}| {{ pad("Last Automation", la_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}
-{{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}+ {{ "-" * la_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}
+{% set job_id_width = 10 %}
+{% set template_width = 24 %}
+{% set org_width = 20 %}
+{% set user_width = 12 %}
+{{ pad("Node Name", node_name_width) }}| {{ pad("Subscription", sub_width) }}| {{ pad("Organizations", org_col_width) }}| {{ pad("Last Automation", la_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad("Job ID", job_id_width) }} | {{ pad("Inventory", template_width) }} | {{ pad("Inv. Org", org_width) }} | {{ pad("User", user_width) }}{% endif %}
+
+{{ "-" * node_name_width }}+ {{ "-" * sub_width }}+ {{ "-" * org_col_width }}+ {{ "-" * la_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}+ {{ "-" * job_id_width }}+ {{ "-" * template_width }}+ {{ "-" * org_width }}+ {{ "-" * user_width }}{% endif %}
+
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
 {% if node.license %}
 {% set subscription = "Yes (consuming)" %}
 {% else %}
@@ -117,7 +128,8 @@ Nodes that have at least one organization, with subscription consumption status 
 {% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
 {% set ac = node.automated_counter | default('', true) | string %}
 {% set dc = node.deleted_counter | default('', true) | string %}
-{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(subscription, sub_width) }}| {{ pad(org_display, org_col_width) }}| {{ pad(la, la_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job_org.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job_org.inventory | default(''), template_width) }} | {{ pad(last_job_org.inventory_organization | default(''), org_width) }} | {{ pad(last_job_org.username | default(''), user_width) }}{% endif %}
+
 {% endif %}
 {% endfor %}
 
@@ -129,17 +141,25 @@ Nodes that are currently consuming a subscription but do not belong to any organ
 
 {% set ts_width = 28 %}
 {% set counter_width = 8 %}
-{{ pad("Node Name", node_name_width) }}| {{ pad("First Automation", ts_width) }}| {{ pad("Last Automation", ts_width) }}| {{ pad("Last Deleted", ts_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}
-{{ "-" * node_name_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}
+{{ pad("Node Name", node_name_width) }}| {{ pad("First Automation", ts_width) }}| {{ pad("Last Automation", ts_width) }}| {{ pad("Last Deleted", ts_width) }}| {{ pad("Auto Cnt", counter_width) }}| {{ pad("Del Cnt", counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad("Job ID", job_id_width) }} | {{ pad("Inventory", template_width) }} | {{ pad("Inv. Org", org_width) }} | {{ pad("User", user_width) }}{% endif %}
+
+{{ "-" * node_name_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * ts_width }}+ {{ "-" * counter_width }}+ {{ "-" * counter_width }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}+ {{ "-" * job_id_width }}+ {{ "-" * template_width }}+ {{ "-" * org_width }}+ {{ "-" * user_width }}{% endif %}
+
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
 {% set fa = node.first_automation | default('', true) | string %}{% set fa = fa.split('T')[0] if fa and 'T' in fa else fa %}
 {% set la = node.last_automation | default('', true) | string %}{% set la = la.split('T')[0] if la and 'T' in la else la %}
 {% set ld = node.last_deleted | default('', true) | string %}{% set ld = ld.split('T')[0] if ld and 'T' in ld else ld %}
 {% set ac = node.automated_counter | default('', true) | string %}
 {% set dc = node.deleted_counter | default('', true) | string %}
-{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}
+{{ pad(node.nodename, node_name_width) }}| {{ pad(fa, ts_width) }}| {{ pad(la, ts_width) }}| {{ pad(ld, ts_width) }}| {{ pad(ac, counter_width) }}| {{ pad(dc, counter_width) }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ pad(last_job.job_template_id | default('') | string, job_id_width) }} | {{ pad(last_job.inventory | default(''), template_width) }} | {{ pad(last_job.inventory_organization | default(''), org_width) }} | {{ pad(last_job.username | default(''), user_width) }}{% endif %}
+
 {% endif %}
 {% endfor %}
 {% endif %}

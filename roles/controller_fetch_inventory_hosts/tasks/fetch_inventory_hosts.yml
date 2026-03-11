@@ -1,0 +1,44 @@
+---
+# Fetch hosts for one inventory (paginated). Recursively includes self for next page.
+# Merges into controller_inventory_hosts[inv_id]. Expects current_inv_id (and optionally controller_fetch_page).
+
+- name: Fetch inventory {{ current_inv_id }} hosts page {{ controller_fetch_page | default(1) }}
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path }}/inventories/{{ current_inv_id }}/hosts/?page={{ controller_fetch_page | default(1) }}&page_size={{ node_metrics_controller_page_size | default(200) }}"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_ih_page
+
+- name: Merge inventory hosts page into controller_inventory_hosts
+  ansible.builtin.set_fact:
+    controller_inventory_hosts: "{{ _ih_existing | combine({_ih_key: _ih_new_list}) }}"
+  vars:
+    _ih_existing: "{{ controller_inventory_hosts | default({}) }}"
+    _ih_key: "{{ current_inv_id | string }}"
+    _ih_new_list: "{{ (_ih_existing[_ih_key] | default([])) + (controller_ih_page.json.results | default([])) }}"
+
+- name: Brief pause between API requests (inventory hosts)
+  ansible.builtin.pause:
+    seconds: "{{ node_metrics_controller_request_delay | default(0.15) }}"
+    prompt: ""
+  when: (controller_ih_page.json.next | default('', true)) | length > 0
+
+- name: Set next inventory hosts page and inventory id for recursive include
+  ansible.builtin.set_fact:
+    _controller_next_page: "{{ (controller_fetch_page | default(1)) | int + 1 }}"
+    _controller_current_inv_id: "{{ current_inv_id }}"
+  when: (controller_ih_page.json.next | default('', true)) | length > 0
+
+- name: Fetch next inventory hosts page
+  ansible.builtin.include_tasks: fetch_inventory_hosts.yml
+  vars:
+    controller_fetch_page: "{{ _controller_next_page }}"
+    current_inv_id: "{{ _controller_current_inv_id }}"
+  when: (controller_ih_page.json.next | default('', true)) | length > 0
+...

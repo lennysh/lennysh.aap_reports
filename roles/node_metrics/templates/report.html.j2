@@ -303,12 +303,23 @@
                     <th>Last Automation</th>
                     <th>Automated Counter</th>
                     <th>Deleted Counter</th>
+                    {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}
+                    <th>Last Job ID</th>
+                    <th>Inventory</th>
+                    <th>Inv. Org</th>
+                    <th>User</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for node in metrics.nodes -%}
                 {%- set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
                 {%- if has_orgs -%}
+                {%- set ns_org = namespace(node_jobs=[]) %}
+                {%- for job in (jobs_with_hosts | default([])) %}
+                {%- if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+                {%- endfor %}
+                {%- set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
                 <tr>
                     <td>{{ node.nodename }}</td>
                     <td class="{% if node.license %}check-green{% else %}check-red{% endif %}">
@@ -326,6 +337,12 @@
                     <td>{{ date_only(node.last_automation) }}</td>
                     <td>{{ node.automated_counter | default('', true) }}</td>
                     <td>{{ node.deleted_counter | default('', true) }}</td>
+                    {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}
+                    <td>{{ last_job_org.job_template_id if last_job_org else '—' }}</td>
+                    <td>{{ last_job_org.inventory | default('—') }}</td>
+                    <td>{{ last_job_org.inventory_organization | default('—') }}</td>
+                    <td>{{ last_job_org.username | default('—') }}</td>
+                    {% endif %}
                 </tr>
                 {% endif %}
                 {%- endfor -%}
@@ -346,12 +363,23 @@
                     <th>Last Deleted</th>
                     <th>Automated Counter</th>
                     <th>Deleted Counter</th>
+                    {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}
+                    <th>Last Job ID</th>
+                    <th>Inventory</th>
+                    <th>Inv. Org</th>
+                    <th>User</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for node in metrics.nodes -%}
                 {%- set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
                 {%- if not has_orgs -%}
+                {%- set ns = namespace(node_jobs=[]) %}
+                {%- for job in (jobs_with_hosts | default([])) %}
+                {%- if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+                {%- endfor %}
+                {%- set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
                 <tr>
                     <td>{{ node.nodename }}</td>
                     <td>{{ date_only(node.first_automation) }}</td>
@@ -359,6 +387,12 @@
                     <td>{{ date_only(node.last_deleted) }}</td>
                     <td>{{ node.automated_counter | default('', true) }}</td>
                     <td>{{ node.deleted_counter | default('', true) }}</td>
+                    {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}
+                    <td>{{ last_job.job_template_id if last_job else '—' }}</td>
+                    <td>{{ last_job.inventory | default('—') }}</td>
+                    <td>{{ last_job.inventory_organization | default('—') }}</td>
+                    <td>{{ last_job.username | default('—') }}</td>
+                    {% endif %}
                 </tr>
                 {% endif %}
                 {%- endfor -%}

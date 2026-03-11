@@ -1,0 +1,5 @@
+---
+# Call with current_inv_id (and optionally controller_fetch_page). Expects controller_inventory_hosts dict to exist.
+- name: Fetch inventory hosts (paginated per inventory)
+  ansible.builtin.include_tasks: fetch_inventory_hosts.yml
+...

@@ -1,0 +1,47 @@
+---
+# Build controller_jobs_with_hosts from controller_organizations, controller_jobs_raw, controller_job_host_summaries.
+# No API calls. Adds template org name, inventory org name (from org lookup), and deduped lowercase hostnames per job.
+# Expects controller_organizations, controller_jobs_raw, controller_job_host_summaries to be set (e.g. by controller_fetch_* roles).
+
+- name: Initialize controller_jobs_with_hosts list
+  ansible.builtin.set_fact:
+    controller_jobs_with_hosts: []
+
+- name: Build controller_jobs_with_hosts from controller API data
+  ansible.builtin.set_fact:
+    controller_jobs_with_hosts: "{{ (controller_jobs_with_hosts | default([])) + [_built_job] }}"
+  loop: "{{ controller_jobs_raw | default([]) }}"
+  loop_control:
+    label: "Building jobs with hosts for job {{ item.id }}"
+  vars:
+    _job: "{{ item }}"
+    _sf: "{{ _job.summary_fields | default({}) }}"
+    _org: "{{ _sf.organization | default({}) }}"
+    _inv: "{{ _sf.inventory | default({}) }}"
+    _inv_org_id: "{{ _inv.organization_id | default(None) }}"
+    _inv_org_id_int: "{{ (_inv_org_id | int) if (_inv_org_id is defined and _inv_org_id != '' and _inv_org_id is not none) else none }}"
+    _inv_org_name: "{{ (controller_organizations | default([]) | selectattr('id', 'equalto', _inv_org_id_int) | map(attribute='name') | first) if (_inv_org_id_int is defined and _inv_org_id_int is not none) else none }}"
+    _created_by: "{{ _sf.created_by | default({}) }}"
+    _launched_by: "{{ _job.launched_by | default({}) }}"
+    _template: "{{ _sf.job_template | default({}) }}"
+    _project: "{{ _sf.project | default({}) }}"
+    _summaries: "{{ (controller_job_host_summaries | default({}))[_job.id | string] | default([]) }}"
+    _hostnames_raw: "{{ _summaries | map(attribute='host_name') | select | list }}"
+    _hostnames: "{{ _hostnames_raw | map('lower') | map('trim') | reject('equalto', '') | unique | sort }}"
+    _built_job:
+      job_template_id: "{{ _job.id }}"
+      username: "{{ _created_by.username | default(_launched_by.name) }}"
+      job_template_organization: "{{ _org.name | default(None) }}"
+      job_template_organization_id: "{{ _org.id | default(None) }}"
+      inventory: "{{ _inv.name | default(None) }}"
+      inventory_id: "{{ _inv.id | default(None) }}"
+      inventory_organization: "{{ _inv_org_name | default(None) }}"
+      inventory_organization_id: "{{ _inv_org_id | default(None) }}"
+      job_template: "{{ _template.name | default(_job.name) }}"
+      project_id: "{{ _project.id | default(None) }}"
+      project_name: "{{ _project.name | default(None) }}"
+      created: "{{ _job.created }}"
+      started: "{{ _job.started }}"
+      finished: "{{ _job.finished }}"
+      hostnames: "{{ _hostnames }}"
+...

@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: Lenny Shirley
+  description: Detect AAP Controller API base path (2.4 /api/v2 vs 2.5+ /api/controller/v2). Sets controller_api_base_path.
+  company: Red Hat
+  license: MIT
+  min_ansible_version: "2.15.0"
+  galaxy_tags:
+    - aap
+    - controller
+    - api
+dependencies: []
+...

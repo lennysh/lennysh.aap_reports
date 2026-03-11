@@ -1,0 +1,7 @@
+---
+# Action: 'login' (default) obtains a token and sets aap_token/token_url; 'logout' revokes the token.
+controller_token_action: login
+# Used only for login: scope and description sent to POST /api/v2/tokens/
+controller_token_scope: "read"
+controller_token_description: "Temporary token for automation"
+...

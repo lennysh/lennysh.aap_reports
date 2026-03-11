@@ -55,6 +55,11 @@ nodes_with_organizations:
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
     last_automation: {{ date_only(node.last_automation) | tojson }}
@@ -63,7 +68,12 @@ nodes_with_organizations:
     organizations:
 {% for org_id in node.organizations %}
       - {{ org_id }}
-{% endfor %}
+{% endfor %}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job_org %}
+    last_job:
+      id: {{ last_job_org.job_template_id }}
+      inventory: "{{ last_job_org.inventory | default('') }}"
+      inv_org: "{{ last_job_org.inventory_organization | default('') }}"
+      username: "{{ last_job_org.username | default('') }}"{% endif %}
 {% endif %}
 {% endfor %}
 
@@ -71,9 +81,19 @@ orphaned_nodes:
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
   - nodename: "{{ node.nodename }}"
     license: {{ node.license | lower }}
-    organizations: []
+    organizations: []{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job %}
+    last_job:
+      id: {{ last_job.job_template_id }}
+      inventory: "{{ last_job.inventory | default('') }}"
+      inv_org: "{{ last_job.inventory_organization | default('') }}"
+      username: "{{ last_job.username | default('') }}"{% endif %}
 {% endif %}
 {% endfor %}
 {% endif %}

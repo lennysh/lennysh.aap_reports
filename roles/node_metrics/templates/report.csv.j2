@@ -4,6 +4,7 @@ Generated: {{ metrics.generated_at }}
 
 {% if metrics.subscription_details is defined and metrics.subscription_details %}
 Subscription Details
+
 Field,Value
 {% set status_line = metrics.subscription_details.status %}{% if metrics.subscription_details.status_description %}{% set status_line = status_line ~ ' — ' ~ metrics.subscription_details.status_description %}{% endif %}
 Status,{{ status_line | replace('\r', '') | replace('\n', ' ') }}
@@ -39,10 +40,16 @@ Organization,Max Nodes,Unique Nodes,Unique Nodes %,Shared Nodes,Shared Nodes %,U
 
 Node Details by Organization
 
-Node,Subscription,Organizations,Last Automation,Automated Counter,Deleted Counter
+Node,Subscription,Organizations,Last Automation,Automated Counter,Deleted Counter{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %},Last Job ID,Inventory,Inv. Org,User{% endif %}
+
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
 {% set org_names_parts = [] %}
 {% for org_id, org_name in metrics.organization_names.items() %}
 {% set org_id_int = org_id | int %}
@@ -51,17 +58,27 @@ Node,Subscription,Organizations,Last Automation,Automated Counter,Deleted Counte
 {% endif %}
 {% endfor %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-{% set _la = node.last_automation | default('', true) | string %}{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %},"{{ org_names }}",{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
+{% set _la = node.last_automation | default('', true) | string %}
+{{ node.nodename }},{% if node.license %}Yes{% else %}No{% endif %},"{{ org_names }}",{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %},{{ last_job_org.job_template_id if last_job_org else '' }},{{ (last_job_org.inventory | default('')) | string | replace(',', ' ') }},{{ (last_job_org.inventory_organization | default('')) | string | replace(',', ' ') }},{{ (last_job_org.username | default('')) | string | replace(',', ' ') }}{% endif %}
+
 {% endif %}
 {% endfor %}
 
 Orphaned Nodes (nodes consuming a subscription but not in any organization)
 
-Node,First Automation,Last Automation,Last Deleted,Automated Counter,Deleted Counter
+Node,First Automation,Last Automation,Last Deleted,Automated Counter,Deleted Counter{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %},Last Job ID,Inventory,Inv. Org,User{% endif %}
+
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-{% set _fa = node.first_automation | default('', true) | string %}{% set _la = node.last_automation | default('', true) | string %}{% set _ld = node.last_deleted | default('', true) | string %}{{ node.nodename }},{{ _fa.split('T')[0] if _fa and 'T' in _fa else _fa }},{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ _ld.split('T')[0] if _ld and 'T' in _ld else _ld }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
+{% set _fa = node.first_automation | default('', true) | string %}{% set _la = node.last_automation | default('', true) | string %}{% set _ld = node.last_deleted | default('', true) | string %}
+{{ node.nodename }},{{ _fa.split('T')[0] if _fa and 'T' in _fa else _fa }},{{ _la.split('T')[0] if _la and 'T' in _la else _la }},{{ _ld.split('T')[0] if _ld and 'T' in _ld else _ld }},{{ node.automated_counter | default('', true) | string }},{{ node.deleted_counter | default('', true) | string }}{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %},{{ last_job.job_template_id if last_job else '' }},{{ (last_job.inventory | default('')) | string | replace(',', ' ') }},{{ (last_job.inventory_organization | default('')) | string | replace(',', ' ') }},{{ (last_job.username | default('')) | string | replace(',', ' ') }}{% endif %}
+
 {% endif %}
 {% endfor %}
 {% endif %}

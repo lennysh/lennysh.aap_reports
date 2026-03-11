@@ -1,0 +1,24 @@
+---
+# POST {{ controller_api_base_path }}/tokens/ with Basic auth; set aap_token and token_url for the play.
+# Requires controller_api_base_path (run controller_detect first, done in main.yml). aap_url, aap_username, aap_password.
+
+- name: Obtain AAP OAuth2 token
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path | default('/api/v2') }}/tokens/"
+    method: POST
+    headers:
+      Authorization: "Basic {{ (aap_username + ':' + aap_password) | b64encode }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      scope: "{{ controller_token_scope }}"
+      description: "{{ controller_token_description }}"
+    status_code: 201
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+  register: _controller_token_response
+
+- name: Set token facts for play
+  ansible.builtin.set_fact:
+    aap_token: "{{ _controller_token_response.json.token }}"
+    token_url: "{{ _controller_token_response.json.url }}"
+...

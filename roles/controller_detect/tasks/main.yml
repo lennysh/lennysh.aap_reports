@@ -1,0 +1,54 @@
+---
+# Detect AAP Controller API base path: 2.5+ uses /api/controller/v2, 2.4 uses /api/v2.
+# Sets controller_api_base_path for use by other controller roles/tasks.
+# Expects aap_url, and either aap_token or (aap_username + aap_password). Optional aap_validate_certs.
+
+- name: Try AAP 2.5+ API path (/api/controller/v2)
+  ansible.builtin.uri:
+    url: "{{ aap_url }}/api/controller/v2/organizations/?page=1&page_size=1"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_api_try_25
+  ignore_errors: true
+
+- name: Set API base path to AAP 2.5+ (/api/controller/v2)
+  ansible.builtin.set_fact:
+    controller_api_base_path: "/api/controller/v2"
+  when:
+    - controller_api_try_25 is defined
+    - not controller_api_try_25.failed | default(true)
+
+- name: Try AAP 2.4 API path (/api/v2)
+  ansible.builtin.uri:
+    url: "{{ aap_url }}/api/v2/organizations/?page=1&page_size=1"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_api_try_24
+  ignore_errors: true
+  when: controller_api_base_path is not defined
+
+- name: Set API base path to AAP 2.4 (/api/v2)
+  ansible.builtin.set_fact:
+    controller_api_base_path: "/api/v2"
+  when:
+    - controller_api_try_24 is defined
+    - not controller_api_try_24.failed | default(true)
+    - controller_api_base_path is not defined
+
+- name: Fail if Controller API path could not be detected
+  ansible.builtin.fail:
+    msg: "Could not detect Controller API path. Check AAP URL and credentials (try /api/controller/v2 and /api/v2)."
+  when: controller_api_base_path is not defined
+...

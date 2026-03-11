@@ -1,0 +1,60 @@
+---
+- name: Generate AAP Controller Jobs with Host Summaries Reports
+  hosts: localhost
+  gather_facts: false
+  vars:
+    output_folder: "{{ playbook_dir }}"
+    output_filename: "controller_jobs_with_hosts"
+
+  tasks:
+    - name: Token Lifecycle Block
+      block:
+        - name: Login and get OAuth2 token
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+
+        # - name: Display token info
+        #   ansible.builtin.debug:
+        #     msg:
+        #       - "Token URL: {{ token_url }}"
+        #       - "Token: {{ aap_token }}"
+
+        - name: Fetch Controller organizations (paginated, shared by metrics and jobs_with_hosts)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_fetch_organizations
+
+        - name: Fetch Controller jobs (paginated)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_fetch_jobs
+
+        - name: Initialize controller_job_host_summaries dict
+          ansible.builtin.set_fact:
+            controller_job_host_summaries: {}
+
+        - name: Fetch job host summaries per job (paginated per job)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_fetch_job_host_summaries
+          vars:
+            current_job_id: "{{ item }}"
+          loop: "{{ controller_jobs_raw | default([]) | map(attribute='id') | list }}"
+          loop_control:
+            loop_var: item
+
+        - name: Get all jobs with host summaries
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_build_jobs_with_hosts
+
+        # controller_jobs_with_hosts is the full structure; e.g. write to file:
+        - name: Write JSON to file
+          ansible.builtin.copy:
+            content: "{{ controller_jobs_with_hosts | to_nice_json }}"
+            dest: "{{ output_folder }}/{{ output_filename }}.json"
+            mode: "0644"
+
+      always:
+        - name: Logout (revoke token)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+          vars:
+            controller_token_action: logout
+...

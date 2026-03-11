@@ -1,0 +1,4 @@
+---
+- name: Fetch Controller organizations (paginated)
+  ansible.builtin.include_tasks: fetch_organizations.yml
+...

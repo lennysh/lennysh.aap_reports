@@ -1,0 +1,21 @@
+---
+# DELETE the token at token_url (set during login; path is already correct for this AAP version).
+# Use in always: to revoke after block. Requires aap_url, aap_username, aap_password, token_url.
+
+- name: Revoke AAP OAuth2 token
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ token_url }}"
+    method: DELETE
+    headers:
+      Authorization: "Basic {{ (aap_username + ':' + aap_password) | b64encode }}"
+      Content-Type: "application/json"
+    status_code: [204, 404]
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+  when: token_url is defined
+  register: _controller_token_revoke
+
+- name: Confirm token revoked
+  ansible.builtin.debug:
+    msg: "Token successfully revoked."
+  when: _controller_token_revoke is defined and _controller_token_revoke.status == 204
+...

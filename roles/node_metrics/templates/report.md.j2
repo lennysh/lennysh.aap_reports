@@ -44,11 +44,16 @@
 
 Nodes that have at least one organization, with subscription consumption status (green ✓ = consuming subscription, red ✗ = not consuming) and organization membership (comma-separated list of organizations).
 
-| Node | Subscription | Organizations | Last Automation | Automated Counter | Deleted Counter |
-|:-----|:------------:|:--------------|:---------------:|:-----------------:|:----------------:|
+| Node | Subscription | Organizations | Last Automation | Automated Counter | Deleted Counter {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}| Last Job ID | Inventory | Inv. Org | User {% endif %}|
+|:-----|:------------:|:--------------|:---------------:|:-----------------:|:----------------:{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}|:-----------:|:---------:|:--------:|:----:{% endif %}|
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
 {% set org_names_parts = [] %}
 {% for org_id, org_name in metrics.organization_names.items() %}
 {% set org_id_int = org_id | int %}
@@ -57,7 +62,7 @@ Nodes that have at least one organization, with subscription consumption status 
 {% endif %}
 {% endfor %}
 {% set org_names = org_names_parts | sort | join(", ") %}
-| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} | {{ org_names }} | {{ date_only(node.last_automation) }} | {{ node.automated_counter | default('', true) }} | {{ node.deleted_counter | default('', true) }} |
+| {{ node.nodename }} | {% if node.license %}<span style="color: green;">✓</span>{% else %}<span style="color: red;">✗</span>{% endif %} | {{ org_names }} | {{ date_only(node.last_automation) }} | {{ node.automated_counter | default('', true) }} | {{ node.deleted_counter | default('', true) }} {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ last_job_org.job_template_id if last_job_org else '—' }} | {{ last_job_org.inventory | default('—') }} | {{ last_job_org.inventory_organization | default('—') }} | {{ last_job_org.username | default('—') }} {% endif %}|
 {% endif %}
 {% endfor %}
 
@@ -65,12 +70,17 @@ Nodes that have at least one organization, with subscription consumption status 
 
 Nodes that are currently consuming a subscription but do not belong to any organization.
 
-| Node | First Automation | Last Automation | Last Deleted | Automated Counter | Deleted Counter |
-|:-----|:----------------:|:---------------:|:------------:|:-----------------:|:----------------:|
+| Node | First Automation | Last Automation | Last Deleted | Automated Counter | Deleted Counter {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}| Last Job ID | Inventory | Inv. Org | User {% endif %}|
+|:-----|:----------------:|:---------------:|:------------:|:-----------------:|:----------------:{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %}|:-----------:|:---------:|:--------:|:----:{% endif %}|
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
-| {{ node.nodename }} | {{ date_only(node.first_automation) }} | {{ date_only(node.last_automation) }} | {{ date_only(node.last_deleted) }} | {{ node.automated_counter | default('', true) }} | {{ node.deleted_counter | default('', true) }} |
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
+| {{ node.nodename }} | {{ date_only(node.first_automation) }} | {{ date_only(node.last_automation) }} | {{ date_only(node.last_deleted) }} | {{ node.automated_counter | default('', true) }} | {{ node.deleted_counter | default('', true) }} {% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 %} | {{ last_job.job_template_id if last_job else '—' }} | {{ last_job.inventory | default('—') }} | {{ last_job.inventory_organization | default('—') }} | {{ last_job.username | default('—') }} {% endif %}|
 {% endif %}
 {% endfor %}
 {% endif %}

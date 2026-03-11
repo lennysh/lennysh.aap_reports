@@ -1,0 +1,38 @@
+---
+# Fetch all host_metrics (paginated). Recursively includes self for next page.
+# Dumps into controller_host_metrics (list).
+
+- name: Fetch host_metrics page {{ controller_fetch_page | default(1) }}
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path }}/host_metrics/?page={{ controller_fetch_page | default(1) }}&page_size={{ node_metrics_controller_page_size | default(200) }}"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_hm_page
+
+- name: Append host_metrics page to controller_host_metrics
+  ansible.builtin.set_fact:
+    controller_host_metrics: "{{ (controller_host_metrics | default([])) + (controller_hm_page.json.results | default([])) }}"
+
+- name: Brief pause between API requests (host_metrics)
+  ansible.builtin.pause:
+    seconds: "{{ node_metrics_controller_request_delay | default(0.15) }}"
+    prompt: ""
+  when: (controller_hm_page.json.next | default('', true)) | length > 0
+
+- name: Set next host_metrics page number
+  ansible.builtin.set_fact:
+    _controller_next_page: "{{ (controller_fetch_page | default(1)) | int + 1 }}"
+  when: (controller_hm_page.json.next | default('', true)) | length > 0
+
+- name: Fetch next host_metrics page
+  ansible.builtin.include_tasks: fetch_host_metrics.yml
+  vars:
+    controller_fetch_page: "{{ _controller_next_page }}"
+  when: (controller_hm_page.json.next | default('', true)) | length > 0
+...

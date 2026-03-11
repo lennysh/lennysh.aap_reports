@@ -1,0 +1,22 @@
+---
+# Fetch Controller /config (single request). Sets controller_config.
+
+- name: Fetch Controller config
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path }}/config"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_config_result
+  ignore_errors: true
+  failed_when: false
+
+- name: Set controller_config from config response
+  ansible.builtin.set_fact:
+    controller_config: "{{ controller_config_result.json if (controller_config_result is defined and controller_config_result.status is defined and controller_config_result.status == 200) else none }}"
+...

@@ -1,0 +1,38 @@
+---
+# Fetch all jobs (paginated). Recursively includes self for next page.
+# Dumps into controller_jobs_raw (list). Uses controller_api_base_path.
+
+- name: Fetch jobs page {{ controller_fetch_page | default(1) }}
+  ansible.builtin.uri:
+    url: "{{ aap_url }}{{ controller_api_base_path }}/jobs/?page={{ controller_fetch_page | default(1) }}&page_size={{ node_metrics_controller_page_size | default(200) }}"
+    method: GET
+    user: "{{ aap_username if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    password: "{{ aap_password if (aap_token is not defined or aap_token | length == 0) else omit }}"
+    force_basic_auth: "{{ (aap_token is not defined or aap_token | length == 0) and (aap_username is defined and aap_username | length > 0) }}"
+    headers: "{{ {'Authorization': 'Bearer ' ~ aap_token} if (aap_token is defined and aap_token | length > 0) else omit }}"
+    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
+    return_content: true
+    status_code: [200]
+  register: controller_jobs_page
+
+- name: Append jobs page to controller_jobs_raw
+  ansible.builtin.set_fact:
+    controller_jobs_raw: "{{ (controller_jobs_raw | default([])) + (controller_jobs_page.json.results | default([])) }}"
+
+- name: Brief pause between API requests (jobs)
+  ansible.builtin.pause:
+    seconds: "{{ node_metrics_controller_request_delay | default(0.15) }}"
+    prompt: ""
+  when: (controller_jobs_page.json.next | default('', true)) | length > 0
+
+- name: Set next jobs page number
+  ansible.builtin.set_fact:
+    _controller_next_page: "{{ (controller_fetch_page | default(1)) | int + 1 }}"
+  when: (controller_jobs_page.json.next | default('', true)) | length > 0
+
+- name: Fetch next jobs page
+  ansible.builtin.include_tasks: fetch_jobs.yml
+  vars:
+    controller_fetch_page: "{{ _controller_next_page }}"
+  when: (controller_jobs_page.json.next | default('', true)) | length > 0
+...

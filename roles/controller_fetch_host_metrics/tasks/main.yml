@@ -1,0 +1,4 @@
+---
+- name: Fetch Controller host_metrics (paginated)
+  ansible.builtin.include_tasks: fetch_host_metrics.yml
+...

@@ -45,6 +45,11 @@
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if has_orgs %}
+{% set ns_org = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns_org.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (ns_org.node_jobs | sort(attribute='finished', reverse=true) | first) if ns_org.node_jobs else none %}
         <node>
             <nodename>{{ node.nodename }}</nodename>
             <license>{{ node.license | lower }}</license>
@@ -55,7 +60,13 @@
 {% for org_id in node.organizations %}
                 <organization_id>{{ org_id }}</organization_id>
 {% endfor %}
-            </organizations>
+            </organizations>{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job_org %}
+            <last_job>
+                <id>{{ last_job_org.job_template_id }}</id>
+                <inventory>{{ last_job_org.inventory | default('') }}</inventory>
+                <inv_org>{{ last_job_org.inventory_organization | default('') }}</inv_org>
+                <username>{{ last_job_org.username | default('') }}</username>
+            </last_job>{% endif %}
         </node>
 {% endif %}
 {% endfor %}
@@ -65,10 +76,21 @@
 {% for node in metrics.nodes %}
 {% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
 {% if not has_orgs %}
+{% set ns = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = ns.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (ns.node_jobs | sort(attribute='finished', reverse=true) | first) if ns.node_jobs else none %}
         <node>
             <nodename>{{ node.nodename }}</nodename>
             <license>{{ node.license | lower }}</license>
-            <organizations/>
+            <organizations/>{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job %}
+            <last_job>
+                <id>{{ last_job.job_template_id }}</id>
+                <inventory>{{ last_job.inventory | default('') }}</inventory>
+                <inv_org>{{ last_job.inventory_organization | default('') }}</inv_org>
+                <username>{{ last_job.username | default('') }}</username>
+            </last_job>{% endif %}
         </node>
 {% endif %}
 {% endfor %}

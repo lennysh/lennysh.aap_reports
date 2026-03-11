@@ -1,22 +1,80 @@
 ---
 # tasks file for node_metrics
+# Controller API data is fetched via reusable controller_* roles; they set controller_* facts.
+# build_metrics remains in this role (node_metrics-specific). Jobs-with-hosts uses controller_build_jobs_with_hosts role.
 
-- name: Collect node metrics data
-  lennysh.aap_reports.node_metrics:
-    url: "{{ aap_url }}"
-    username: "{{ aap_username | default(omit) }}"
-    password: "{{ aap_password | default(omit) }}"
-    token: "{{ aap_token | default(omit) }}"
-    validate_certs: "{{ aap_validate_certs | default(true) | bool }}"
-  register: node_metrics_data_result
+- name: Detect Controller API path (AAP 2.4 vs 2.5+)
+  ansible.builtin.include_role:
+    name: controller_detect
+  when: controller_api_base_path is not defined
 
-- name: Set metrics_data from successful result
+- name: Fetch Controller organizations (paginated, shared by metrics and jobs_with_hosts)
+  ansible.builtin.include_role:
+    name: controller_fetch_organizations
+
+- name: Fetch Controller config
+  ansible.builtin.include_role:
+    name: controller_fetch_config
+
+- name: Fetch Controller host_metrics (paginated)
+  ansible.builtin.include_role:
+    name: controller_fetch_host_metrics
+
+- name: Fetch Controller inventories (paginated)
+  ansible.builtin.include_role:
+    name: controller_fetch_inventories
+
+- name: Initialize controller_inventory_hosts dict
   ansible.builtin.set_fact:
-    node_metrics_data: "{{ node_metrics_data_result }}"
-  when:
-    - node_metrics_data_result is defined
-    - node_metrics_data_result.skipped is not defined or not node_metrics_data_result.skipped
-    - node_metrics_data_result.failed is not defined or not node_metrics_data_result.failed
+    controller_inventory_hosts: {}
+
+- name: Fetch inventory hosts per inventory (paginated per inventory)
+  ansible.builtin.include_role:
+    name: controller_fetch_inventory_hosts
+  vars:
+    current_inv_id: "{{ item }}"
+  loop: "{{ controller_inventories | default([]) | map(attribute='id') | list }}"
+  loop_control:
+    loop_var: item
+
+- name: Build node_metrics_data from controller vars (no API calls)
+  ansible.builtin.include_tasks: controller/build_metrics.yml
+
+# Optional: jobs with host summaries (reuses controller_organizations)
+- name: Fetch Controller jobs (paginated)
+  ansible.builtin.include_role:
+    name: controller_fetch_jobs
+  when: node_metrics_include_jobs_with_hosts | default(false) | bool
+
+- name: Initialize controller_job_host_summaries dict
+  ansible.builtin.set_fact:
+    controller_job_host_summaries: {}
+  when: node_metrics_include_jobs_with_hosts | default(false) | bool
+
+- name: Fetch job host summaries per job (paginated per job)
+  ansible.builtin.include_role:
+    name: controller_fetch_job_host_summaries
+  vars:
+    current_job_id: "{{ item }}"
+  loop: "{{ controller_jobs_raw | default([]) | map(attribute='id') | list }}"
+  loop_control:
+    loop_var: item
+  when: node_metrics_include_jobs_with_hosts | default(false) | bool
+
+- name: Build controller_jobs_with_hosts from controller data
+  ansible.builtin.include_role:
+    name: controller_build_jobs_with_hosts
+  when: node_metrics_include_jobs_with_hosts | default(false) | bool
+
+- name: Set node_metrics_jobs_with_hosts for reports
+  ansible.builtin.set_fact:
+    node_metrics_jobs_with_hosts: "{{ controller_jobs_with_hosts | default([]) }}"
+  when: node_metrics_include_jobs_with_hosts | default(false) | bool
+
+- name: Set jobs_with_hosts empty when not including
+  ansible.builtin.set_fact:
+    node_metrics_jobs_with_hosts: []
+  when: not (node_metrics_include_jobs_with_hosts | default(false) | bool)
 
 - name: Verify metrics data was collected successfully
   ansible.builtin.assert:
@@ -25,19 +83,7 @@
       - node_metrics_data.organizations_count is defined
       - node_metrics_data.nodes_count is defined
       - node_metrics_data.metrics is defined
-    fail_msg: |
-      Failed to collect metrics data.
-      Check authentication credentials and AAP URL.
-      {% if node_metrics_data_result.msg is defined %}
-      Error: {{ node_metrics_data_result.msg }}
-      {% endif %}
-      {% if node_metrics_data_result.failed is defined %}
-      Task failed: {{ node_metrics_data_result.failed }}
-      {% endif %}
-      {% if node_metrics_data_result.skipped is defined %}
-      Task was skipped. Condition: {{ node_metrics_data_result.false_condition | default('Unknown') }}
-      {% endif %}
-      Available keys: {{ node_metrics_data_result.keys() | default([]) | list | join(', ') }}
+    fail_msg: "Failed to collect metrics data. Check authentication credentials and AAP URL."
     success_msg: "Metrics data collected successfully"
 
 - name: Display metrics summary
@@ -58,6 +104,7 @@
   vars:
     metrics: "{{ node_metrics_data.metrics }}"
     show_node_details: "{{ node_metrics_show_node_details | default(true) | bool }}"
+    jobs_with_hosts: "{{ node_metrics_jobs_with_hosts | default([]) }}"
   ansible.builtin.template:
     src: "{{ node_metrics_format_templates[item] }}"
     dest: "{{ node_metrics_output_folder }}/{{ node_metrics_output_filename }}.{{ node_metrics_format_extensions[item] }}"

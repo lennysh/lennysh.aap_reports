@@ -46,24 +46,64 @@
   ],
 {% if show_node_details | default(true) | bool %}
   "nodes_with_organizations": [
-{% for node in metrics.nodes if (node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0) %}
+{% set ns_with_orgs = namespace(list=[]) %}
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if has_orgs %}
+{% set nj = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = nj.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job_org = (nj.node_jobs | sort(attribute='finished', reverse=true) | first) if nj.node_jobs else none %}
+{% set _ = ns_with_orgs.list.append({'node': node, 'last_job_org': last_job_org}) %}
+{% endif %}
+{% endfor %}
+{% for entry in ns_with_orgs.list %}
+{% set node = entry.node %}
+{% set last_job_org = entry.last_job_org %}
     {
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
       "last_automation": {{ date_only(node.last_automation) | tojson }},
       "automated_counter": {{ node.automated_counter | default('', true) | tojson }},
       "deleted_counter": {{ node.deleted_counter | default('', true) | tojson }},
-      "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]
+      "organizations": [{% for org_id in node.organizations %}{{ org_id }}{% if not loop.last %}, {% endif %}{% endfor %}]{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job_org %},
+      "last_job": {
+        "id": {{ last_job_org.job_template_id }},
+        "inventory": "{{ last_job_org.inventory | default('') | replace('"', '\\"') }}",
+        "inv_org": "{{ last_job_org.inventory_organization | default('') | replace('"', '\\"') }}",
+        "username": "{{ last_job_org.username | default('') | replace('"', '\\"') }}"
+      }{% endif %}
     }{% if not loop.last %},
 {% endif %}
 {% endfor %}
   ],
   "orphaned_nodes": [
-{% for node in metrics.nodes if not (node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0) %}
+{% set ns_orphans = namespace(orphans=[]) %}
+{% for node in metrics.nodes %}
+{% set has_orgs = node.organizations is defined and node.organizations is not none and (node.organizations | length) > 0 %}
+{% if not has_orgs %}
+{% set nj = namespace(node_jobs=[]) %}
+{% for job in (jobs_with_hosts | default([])) %}
+{% if job.hostnames is defined and node.nodename in job.hostnames %}{% set _ = nj.node_jobs.append(job) %}{% endif %}
+{% endfor %}
+{% set last_job = (nj.node_jobs | sort(attribute='finished', reverse=true) | first) if nj.node_jobs else none %}
+{% set _ = ns_orphans.orphans.append({'node': node, 'last_job': last_job}) %}
+{% endif %}
+{% endfor %}
+{% for entry in ns_orphans.orphans %}
+{% set node = entry.node %}
+{% set last_job = entry.last_job %}
     {
       "nodename": "{{ node.nodename }}",
       "license": {{ node.license | lower }},
-      "organizations": []
+      "organizations": []{% if jobs_with_hosts is defined and jobs_with_hosts | length > 0 and last_job %},
+      "last_job": {
+        "id": {{ last_job.job_template_id }},
+        "inventory": "{{ last_job.inventory | default('') | replace('"', '\\"') }}",
+        "inv_org": "{{ last_job.inventory_organization | default('') | replace('"', '\\"') }}",
+        "username": "{{ last_job.username | default('') | replace('"', '\\"') }}"
+      }{% endif %}
     }{% if not loop.last %},
 {% endif %}
 {% endfor %}

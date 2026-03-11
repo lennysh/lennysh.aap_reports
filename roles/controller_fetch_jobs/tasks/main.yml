@@ -1,0 +1,4 @@
+---
+- name: Fetch Controller jobs (paginated)
+  ansible.builtin.include_tasks: fetch_jobs.yml
+...

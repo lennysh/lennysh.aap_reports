@@ -61,8 +61,8 @@ The role uses separate, reusable roles to fetch Controller data via `ansible.bui
 
 - **Detect:** `controller_detect` runs only when `controller_api_base_path` is not already set (e.g. it is skipped if `controller_token` login already ran it in the same play).
 - **Roles used (in order):** `controller_detect` (when needed), `controller_fetch_organizations`, `controller_fetch_config`, `controller_fetch_host_metrics`, `controller_fetch_inventories`, then (per inventory) `controller_fetch_inventory_hosts`. Optionally when jobs-with-hosts is enabled: `controller_fetch_jobs`, then (per job) `controller_fetch_job_host_summaries`, then `controller_build_jobs_with_hosts`. These roles live alongside `report_node_metrics` in the repo and can be reused by other playbooks or roles.
-- **report_node_metrics-specific (still in this role):** `tasks/controller/build_metrics.yml` (runs `files/build_metrics.py`). This role then sets `report_node_metrics_jobs_with_hosts` from `controller_jobs_with_hosts` when jobs-with-hosts is enabled.
-- **Shared vars (always set):** `controller_api_base_path`, `controller_organizations`, `controller_config`, `controller_host_metrics`, `controller_inventories`, `controller_inventory_hosts`. The role then runs the build_metrics script to produce `report_node_metrics_data`.
+- **report_node_metrics-specific (still in this role):** `tasks/controller/build_metrics.yml` calls the `lennysh.aap_reports.build_node_metrics` module to build the metrics structure from controller data. This role then sets `report_node_metrics_jobs_with_hosts` from `controller_jobs_with_hosts` when jobs-with-hosts is enabled.
+- **Shared vars (always set):** `controller_api_base_path`, `controller_organizations`, `controller_config`, `controller_host_metrics`, `controller_inventories`, `controller_inventory_hosts`. The role then calls the **build_node_metrics** module to produce `report_node_metrics_data`.
 - **When `report_node_metrics_include_jobs_with_hosts` is true:** `controller_jobs_raw`, `controller_job_host_summaries`, and `report_node_metrics_jobs_with_hosts` are also set.
 
 ## Dependencies

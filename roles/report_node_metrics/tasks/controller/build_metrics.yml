@@ -1,33 +1,22 @@
 ---
-# Build node metrics from controller_* vars using build_metrics.py. No API calls.
+# Build node metrics from controller_* vars using build_node_metrics module. No API calls.
 # Requires: controller_config, controller_organizations, controller_host_metrics,
 #           controller_inventories, controller_inventory_hosts, aap_url.
 
-- name: Set build_metrics input file path
+- name: Build report_node_metrics_data from controller data
+  lennysh.aap_reports.build_node_metrics:
+    config: "{{ controller_config | default(omit) }}"
+    organizations: "{{ controller_organizations | default([]) }}"
+    host_metrics: "{{ controller_host_metrics | default([]) }}"
+    inventories: "{{ controller_inventories | default([]) }}"
+    inventory_hosts: "{{ controller_inventory_hosts | default({}) }}"
+    aap_url: "{{ aap_url | default('') }}"
+  register: _build_node_metrics_result
+
+- name: Set report_node_metrics_data from build result
   ansible.builtin.set_fact:
-    _build_metrics_input_file: "{{ report_node_metrics_controller_build_input_file | default('/tmp/controller_metrics_input.json') }}"
-
-- name: Write controller data for build_metrics script
-  ansible.builtin.copy:
-    content: "{{ _metrics_input | to_nice_json }}"
-    dest: "{{ _build_metrics_input_file }}"
-    mode: "0600"
-  vars:
-    _metrics_input:
-      config: "{{ controller_config | default(none) }}"
-      organizations: "{{ controller_organizations | default([]) }}"
-      host_metrics: "{{ controller_host_metrics | default([]) }}"
-      inventories: "{{ controller_inventories | default([]) }}"
-      inventory_hosts: "{{ controller_inventory_hosts | default({}) }}"
-      aap_url: "{{ aap_url }}"
-
-- name: Run build_metrics script
-  ansible.builtin.command:
-    cmd: "python3 {{ role_path }}/files/build_metrics.py {{ _build_metrics_input_file }}"
-  register: build_metrics_result
-  changed_when: false
-
-- name: Set report_node_metrics_data from build_metrics output
-  ansible.builtin.set_fact:
-    report_node_metrics_data: "{{ build_metrics_result.stdout | from_json }}"
+    report_node_metrics_data:
+      metrics: "{{ _build_node_metrics_result.metrics }}"
+      organizations_count: "{{ _build_node_metrics_result.organizations_count }}"
+      nodes_count: "{{ _build_node_metrics_result.nodes_count }}"
 ...

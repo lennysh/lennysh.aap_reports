@@ -1,14 +1,98 @@
-#!/usr/bin/env python3
-"""
-Build node metrics structure from Controller API data (no API calls).
-Reads JSON from stdin: config, organizations, host_metrics, inventories, inventory_hosts, aap_url.
-Outputs JSON: metrics, organizations_count, nodes_count.
-"""
-from __future__ import absolute_import, division, print_function
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-import json
-import sys
+# Copyright: (c) 2026, Lenny Shirley
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+DOCUMENTATION = r'''
+---
+module: build_node_metrics
+short_description: Build node metrics structure from AAP Controller API data (no API calls)
+version_added: "1.0.0"
+description:
+    - Takes controller data (config, organizations, host_metrics, inventories, inventory_hosts)
+      and builds the metrics structure used by the report_node_metrics role (subscription details,
+      per-org stats, node list, percentages). No network calls; pure computation.
+    - Use after fetching data with controller_fetch_* roles; pass the controller_* facts as arguments.
+options:
+    config:
+        description: Controller /config JSON (for subscription/license details). Omit if unavailable.
+        required: false
+        type: dict
+        default: null
+    organizations:
+        description: List of organization dicts from controller_fetch_organizations.
+        required: false
+        type: list
+        elements: dict
+        default: []
+    host_metrics:
+        description: List of host_metrics from controller_fetch_host_metrics.
+        required: false
+        type: list
+        elements: dict
+        default: []
+    inventories:
+        description: List of inventory dicts from controller_fetch_inventories.
+        required: false
+        type: list
+        elements: dict
+        default: []
+    inventory_hosts:
+        description: Dict mapping inventory id (str or int) to list of host dicts (from controller_fetch_inventory_hosts).
+        required: false
+        type: dict
+        default: {}
+    aap_url:
+        description: AAP Controller base URL (e.g. for report header).
+        required: false
+        type: str
+        default: ""
+author: "Lenny Shirley (@lennysh)"
+'''
+
+EXAMPLES = r'''
+# Called by report_node_metrics role after controller_* fetch roles
+- name: Build node metrics from controller data
+  lennysh.aap_reports.build_node_metrics:
+    config: "{{ controller_config | default(omit) }}"
+    organizations: "{{ controller_organizations }}"
+    host_metrics: "{{ controller_host_metrics }}"
+    inventories: "{{ controller_inventories }}"
+    inventory_hosts: "{{ controller_inventory_hosts }}"
+    aap_url: "{{ aap_url }}"
+  register: node_metrics
+
+- name: Use the result
+  ansible.builtin.set_fact:
+    report_node_metrics_data:
+      metrics: "{{ node_metrics.metrics }}"
+      organizations_count: "{{ node_metrics.organizations_count }}"
+      nodes_count: "{{ node_metrics.nodes_count }}"
+...
+'''
+
+RETURN = r'''
+metrics:
+    description: Metrics structure (generated_at, aap_url, subscription_details, organizations, totals, nodes, organization_names).
+    returned: always
+    type: dict
+organizations_count:
+    description: Number of organizations (from input).
+    returned: always
+    type: int
+nodes_count:
+    description: Number of distinct nodes in the built node list.
+    returned: always
+    type: int
+'''
+
+
 from datetime import datetime
+from ansible.module_utils.basic import AnsibleModule
 
 
 def build_subscription_details(config_json):
@@ -60,11 +144,11 @@ def build_subscription_details(config_json):
             try:
                 ts = int(automated_since)
                 since_str = datetime.utcfromtimestamp(ts).strftime("%m/%d/%Y, %I:%M:%S %p") if ts > 1000000000 else "(placeholder)"
-                hosts_automated = f"{automated_instances} since {since_str}"
+                hosts_automated = "%s since %s" % (automated_instances, since_str)
             except (ValueError, TypeError, OSError):
-                hosts_automated = f"{automated_instances} since (placeholder)" if automated_instances is not None else "(placeholder)"
+                hosts_automated = "%s since (placeholder)" % automated_instances if automated_instances is not None else "(placeholder)"
         else:
-            hosts_automated = f"{automated_instances} since (placeholder)" if automated_instances is not None else "(placeholder)"
+            hosts_automated = "%s since (placeholder)" % automated_instances if automated_instances is not None else "(placeholder)"
         subscription_sku = (
             license_info.get("product_name") or license_info.get("subscription_name")
             or license_info.get("sku") or "(placeholder)"
@@ -103,18 +187,12 @@ def calculate_percentage(value, total):
     return round((value / total) * 100, 1)
 
 
-def main():
-    if len(sys.argv) > 1:
-        with open(sys.argv[1], "r") as f:
-            data = json.load(f)
-    else:
-        data = json.load(sys.stdin)
-    config = data.get("config")
-    organizations = data.get("organizations") or []
-    host_metrics = data.get("host_metrics") or []
-    inventories = data.get("inventories") or []
-    inventory_hosts = data.get("inventory_hosts") or {}
-    aap_url = data.get("aap_url") or ""
+def build_metrics(config, organizations, host_metrics, inventories, inventory_hosts, aap_url):
+    organizations = organizations or []
+    host_metrics = host_metrics or []
+    inventories = inventories or []
+    inventory_hosts = inventory_hosts or {}
+    aap_url = aap_url or ""
 
     subscription_details = build_subscription_details(config)
     org_id_to_name = {org["id"]: org["name"] for org in organizations}
@@ -127,7 +205,7 @@ def main():
         for node in hosts:
             nodename = node.get("name") if isinstance(node, dict) else None
             if nodename:
-                inventory_nodes[f"{inv_id}:{nodename}"] = True
+                inventory_nodes["%s:%s" % (inv_id, nodename)] = True
 
     org_nodes_set = {}
     node_to_orgs_set = {}
@@ -289,13 +367,36 @@ def main():
         "organization_names": org_id_to_name,
     }
 
-    out = {
+    return {
         "metrics": metrics,
         "organizations_count": len(organizations),
         "nodes_count": len(nodes_list),
     }
-    json.dump(out, sys.stdout, separators=(",", ":"))
+
+
+def run_module():
+    module = AnsibleModule(
+        argument_spec=dict(
+            config=dict(type="dict", default=None),
+            organizations=dict(type="list", elements="dict", default=[]),
+            host_metrics=dict(type="list", elements="dict", default=[]),
+            inventories=dict(type="list", elements="dict", default=[]),
+            inventory_hosts=dict(type="dict", default={}),
+            aap_url=dict(type="str", default=""),
+        ),
+        supports_check_mode=True,
+    )
+
+    config = module.params["config"]
+    organizations = module.params["organizations"]
+    host_metrics = module.params["host_metrics"]
+    inventories = module.params["inventories"]
+    inventory_hosts = module.params["inventory_hosts"]
+    aap_url = module.params["aap_url"]
+
+    result = build_metrics(config, organizations, host_metrics, inventories, inventory_hosts, aap_url)
+    module.exit_json(changed=False, **result)
 
 
 if __name__ == "__main__":
-    main()
+    run_module()

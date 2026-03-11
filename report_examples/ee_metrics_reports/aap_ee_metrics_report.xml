@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ee_metrics_report>
+  <title>Ansible Automation Platform - Execution Environment Metrics Report</title>
+  <generated_at>2026-03-11T19:57:24Z</generated_at>
+  <aap_url>https://aap.example.com</aap_url>
+  <execution_environments>
+    <execution_environment>
+      <name>Control Plane Execution Environment</name>
+      <created_by_username></created_by_username>
+      <created>2025-10-02T14:26:34.239269Z</created>
+      <modified_by_username></modified_by_username>
+      <modified>2026-03-06T21:37:40.485105Z</modified>
+      <organization_name></organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Default execution environment</name>
+      <created_by_username></created_by_username>
+      <created>2025-10-02T14:26:34.188471Z</created>
+      <modified_by_username></modified_by_username>
+      <modified>2026-03-06T21:37:40.465308Z</modified>
+      <organization_name></organization_name>
+      <last_used_by_job>2026-02-06T21:09:57.830598Z</last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>ee-supported-rhel9:latest</name>
+      <created_by_username>lshirley</created_by_username>
+      <created>2025-12-17T21:45:16.409076Z</created>
+      <modified_by_username>lshirley</modified_by_username>
+      <modified>2025-12-17T21:45:16.409106Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job>2025-12-17T22:00:31.055688Z</last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Minimal execution environment</name>
+      <created_by_username></created_by_username>
+      <created>2025-10-02T14:26:34.104249Z</created>
+      <modified_by_username></modified_by_username>
+      <modified>2026-03-06T21:37:40.420924Z</modified>
+      <organization_name></organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-24 - ee-casc-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:20.907964Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:20.908001Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-24 - ee-casc-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:21.132591Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:21.132622Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-25 - ee-casc-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:21.441471Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:21.441529Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-25 - ee-casc-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:25.803690Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:25.803712Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-26 - ee-casc-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:21.193133Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:21.193160Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ansible-automation-platform-26 - ee-casc-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:21.505006Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:21.505049Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Quay - lshirley - ee-xorriso-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-09T18:03:21.052152Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-09T18:03:21.052181Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-24 - ee-minimal-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.453656Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.453704Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-24 - ee-minimal-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.607822Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.607845Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-24 - ee-supported-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.117119Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.117135Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-24 - ee-supported-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.119098Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.119114Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-25 - ee-minimal-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.748007Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.748036Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-25 - ee-minimal-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.971544Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.971575Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-25 - ee-supported-rhel8</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.016050Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.016163Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job>2025-12-17T21:40:48.980967Z</last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-25 - ee-supported-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:53.935059Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:53.935120Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-26 - ee-minimal-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:55.116867Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:55.116895Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-26 - ee-supported-rhel9</name>
+      <created_by_username>admin</created_by_username>
+      <created>2025-10-14T17:11:54.351057Z</created>
+      <modified_by_username>admin</modified_by_username>
+      <modified>2025-10-14T17:11:54.351086Z</modified>
+      <organization_name>DEMOLab</organization_name>
+      <last_used_by_job></last_used_by_job>
+    </execution_environment>
+    <execution_environment>
+      <name>Red Hat - ansible-automation-platform-tech-preview - ee-minimal-rhel9</name>
+      <created_by_username>lshirley</created_by_username>
+      <created>2026-01-15T16:55:08.628899Z</created>
+      <modified_by_username>lshirley</modified_by_username>
+      <modified>2026-01-15T17:09:13.303497Z</modified>
+      <organization_name></organization_name>
+      <last_used_by_job>2026-03-11T18:51:23.075818Z</last_used_by_job>
+    </execution_environment>
+  </execution_environments>
+</ee_metrics_report>

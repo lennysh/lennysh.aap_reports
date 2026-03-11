@@ -1087,5 +1087,5 @@ Nodes that are currently consuming a subscription but do not belong to any organ
 
 - **Unique Nodes**: Nodes that exist only in this organization
 - **Shared Nodes**: Nodes that exist in multiple organizations
-- **Unique Subscriptions**: Subscription-consuming nodes (from node_metrics) that exist only in this organization
-- **Shared Subscriptions**: Subscription-consuming nodes (from node_metrics) that exist in multiple organizations
+- **Unique Subscriptions**: Subscription-consuming nodes (from node metrics report) that exist only in this organization
+- **Shared Subscriptions**: Subscription-consuming nodes (from node metrics report) that exist in multiple organizations

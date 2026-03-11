@@ -1,0 +1,205 @@
+{
+  "title": "Ansible Automation Platform - Execution Environment Metrics Report",
+  "generated_at": "2026-03-11T19:57:24Z",
+  "aap_url": "https://aap.example.com",
+  "execution_environments": [
+    {
+      "name": "Control Plane Execution Environment",
+      "created_by_username": "",
+      "created": "2025-10-02T14:26:34.239269Z",
+      "modified_by_username": "",
+      "modified": "2026-03-06T21:37:40.485105Z",
+      "organization_name": "",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Default execution environment",
+      "created_by_username": "",
+      "created": "2025-10-02T14:26:34.188471Z",
+      "modified_by_username": "",
+      "modified": "2026-03-06T21:37:40.465308Z",
+      "organization_name": "",
+      "last_used_by_job": "2026-02-06T21:09:57.830598Z"
+    },
+    {
+      "name": "ee-supported-rhel9:latest",
+      "created_by_username": "lshirley",
+      "created": "2025-12-17T21:45:16.409076Z",
+      "modified_by_username": "lshirley",
+      "modified": "2025-12-17T21:45:16.409106Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": "2025-12-17T22:00:31.055688Z"
+    },
+    {
+      "name": "Minimal execution environment",
+      "created_by_username": "",
+      "created": "2025-10-02T14:26:34.104249Z",
+      "modified_by_username": "",
+      "modified": "2026-03-06T21:37:40.420924Z",
+      "organization_name": "",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-24 - ee-casc-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:20.907964Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:20.908001Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-24 - ee-casc-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:21.132591Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:21.132622Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-25 - ee-casc-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:21.441471Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:21.441529Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-25 - ee-casc-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:25.803690Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:25.803712Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-26 - ee-casc-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:21.193133Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:21.193160Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ansible-automation-platform-26 - ee-casc-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:21.505006Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:21.505049Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Quay - lshirley - ee-xorriso-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-09T18:03:21.052152Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-09T18:03:21.052181Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-24 - ee-minimal-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.453656Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.453704Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-24 - ee-minimal-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.607822Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.607845Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-24 - ee-supported-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.117119Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.117135Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-24 - ee-supported-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.119098Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.119114Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-25 - ee-minimal-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.748007Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.748036Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-25 - ee-minimal-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.971544Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.971575Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-25 - ee-supported-rhel8",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.016050Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.016163Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": "2025-12-17T21:40:48.980967Z"
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-25 - ee-supported-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:53.935059Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:53.935120Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-26 - ee-minimal-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:55.116867Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:55.116895Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-26 - ee-supported-rhel9",
+      "created_by_username": "admin",
+      "created": "2025-10-14T17:11:54.351057Z",
+      "modified_by_username": "admin",
+      "modified": "2025-10-14T17:11:54.351086Z",
+      "organization_name": "DEMOLab",
+      "last_used_by_job": null
+    },
+    {
+      "name": "Red Hat - ansible-automation-platform-tech-preview - ee-minimal-rhel9",
+      "created_by_username": "lshirley",
+      "created": "2026-01-15T16:55:08.628899Z",
+      "modified_by_username": "lshirley",
+      "modified": "2026-01-15T17:09:13.303497Z",
+      "organization_name": "",
+      "last_used_by_job": "2026-03-11T18:51:23.075818Z"
+    }
+  ]
+}

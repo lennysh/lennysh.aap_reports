@@ -39,14 +39,6 @@ This collection includes the following roles:
 
 **Controller roles** (reusable in playbooks; many depend on **global_vars**): `controller_detect` (API path), `controller_token` (OAuth2 login/logout), `controller_fetch_*` (organizations, config, host_metrics, inventories, inventory_hosts, jobs, job_host_summaries, execution_environments), `controller_build_jobs_with_hosts`, `controller_build_ee_metrics`. See each role’s README under `roles/` for details.
 
-## Plugins
-
-This collection includes the following plugins:
-
-| Plugin | Description | Documentation |
-|--------|-------------|---------------|
-| `lennysh.aap_reports.node_metrics` (module) | Collects node metrics data from AAP Controller API. Returns structured JSON data that can be used with Ansible templates to generate custom reports. | [Plugins README](plugins/README.md) |
-
 ## Quick Start
 
 ### Using the Node Metrics Report Role

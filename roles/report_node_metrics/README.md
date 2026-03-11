@@ -68,7 +68,6 @@ The role uses separate, reusable roles to fetch Controller data via `ansible.bui
 ## Dependencies
 
 - **global_vars** – This role depends on the **global_vars** role for `controller_page_size` and `controller_request_delay` (used by the controller_fetch_* roles it includes). When you use `report_node_metrics`, global_vars is applied automatically via role dependencies.
-- This role does not use the `lennysh.aap_reports.node_metrics` module. It uses `ansible.builtin.uri` and a bundled Python script (`files/build_metrics.py`) to build the metrics structure from Controller API data.
 
 ## Example Playbooks
 

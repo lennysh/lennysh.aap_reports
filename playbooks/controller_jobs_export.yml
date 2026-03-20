@@ -1,0 +1,33 @@
+---
+- name: Export AAP Controller jobs to CSV (no host summaries)
+  hosts: localhost
+  gather_facts: false
+  vars:
+    output_folder: "{{ playbook_dir }}"
+    output_filename: controller_jobs_export
+
+  tasks:
+    - name: Token Lifecycle Block
+      block:
+        - name: Login and get OAuth2 token
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+
+        - name: Fetch Controller jobs (paginated)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_fetch_jobs
+
+        - name: Write jobs CSV from API data
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_build_jobs_csv
+          vars:
+            controller_build_jobs_csv_output_folder: "{{ output_folder }}"
+            controller_build_jobs_csv_output_filename: "{{ output_filename }}"
+
+      always:
+        - name: Logout (revoke token)
+          ansible.builtin.include_role:
+            name: lennysh.aap_reports.controller_token
+          vars:
+            controller_token_action: logout
+...

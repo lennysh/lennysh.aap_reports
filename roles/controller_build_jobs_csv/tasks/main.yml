@@ -1,0 +1,23 @@
+---
+# Writes CSV from controller_jobs_raw (from controller_fetch_jobs). No API calls.
+
+- name: Ensure output folder exists
+  ansible.builtin.file:
+    path: "{{ controller_build_jobs_csv_output_folder }}"
+    state: directory
+    mode: "0755"
+
+- name: Gather date_time for report timestamp
+  ansible.builtin.setup:
+    gather_subset:
+      - date_time
+  when: controller_build_jobs_csv_generated_at is not defined and ansible_date_time is not defined
+
+- name: Write Controller jobs CSV
+  ansible.builtin.template:
+    src: controller_jobs_export.csv.j2
+    dest: "{{ controller_build_jobs_csv_output_folder }}/{{ controller_build_jobs_csv_output_filename }}.csv"
+    mode: "0644"
+  vars:
+    generated_at: "{{ controller_build_jobs_csv_generated_at | default(ansible_date_time.iso8601) }}"
+    aap_url: "{{ controller_build_jobs_csv_aap_url | default(aap_url | default('')) }}"

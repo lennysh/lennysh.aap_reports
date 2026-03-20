@@ -1,0 +1,17 @@
+Ansible Automation Platform - Controller Jobs Export
+Generated: {{ generated_at }}
+AAP Instance: {{ aap_url }}
+
+Job ID,Job Template Name,Job Template ID,Execution Environment Name,Execution Environment ID,Execution Environment Image,Project Name,Project ID,Inventory Name,Inventory ID,Date/Time Started,Date/Time Finished,Launched By User ID,Launched By User Name
+{% for job in controller_jobs_raw | default([]) %}
+{% set sf = job.summary_fields | default({}) %}
+{% set jt = sf.job_template | default({}) %}
+{% set ee = sf.execution_environment | default({}) %}
+{% set proj = sf.project | default({}) %}
+{% set inv = sf.inventory | default({}) %}
+{% set lb = sf.launched_by | default(job.launched_by | default({})) %}
+{% set ee_id = ee.id | default(job.execution_environment | default('')) %}
+{% set lb_full = ((lb.first_name | default('') ~ ' ' ~ lb.last_name | default('')) | trim) %}
+{% set lb_name = lb.username | default(lb.name | default(lb_full, true), true) %}
+"{{ job.id | default('') }}","{{ (jt.name | default('')) | replace('"', '""') }}","{{ jt.id | default('') }}","{{ (ee.name | default('')) | replace('"', '""') }}","{{ ee_id }}","{{ (ee.image | default('')) | replace('"', '""') }}","{{ (proj.name | default('')) | replace('"', '""') }}","{{ proj.id | default('') }}","{{ (inv.name | default('')) | replace('"', '""') }}","{{ inv.id | default('') }}",{{ (job.started | default('')) | string | replace(',', ' ') }},{{ (job.finished | default('')) | string | replace(',', ' ') }},"{{ lb.id | default('') }}","{{ lb_name | replace('"', '""') }}"
+{% endfor %}

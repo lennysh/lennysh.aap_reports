@@ -1,0 +1,3 @@
+---
+controller_build_jobs_csv_output_folder: "{{ playbook_dir }}"
+controller_build_jobs_csv_output_filename: controller_jobs_export
